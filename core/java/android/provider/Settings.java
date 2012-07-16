@@ -2256,6 +2256,12 @@ public final class Settings {
          * @hide
          */
         public static final String LOCKSCREEN_IF_CALL_ENDS_WITH_SCREENOFF = "lockscreen_if_call_ends_with_screenoff";
+  
+      /**
+         * Stores values for custom lockscreen targets
+         * @hide
+         */
+        public static final String LOCKSCREEN_TARGETS = "lockscreen_targets";
 
         /**
          * URI for the low battery sound file.

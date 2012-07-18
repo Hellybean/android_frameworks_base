@@ -817,7 +817,7 @@ public class PhoneStatusBar extends BaseStatusBar {
     }
 
     private void repositionNavigationBar() {
-        if (mNavigationBarView == null) return;
+        if (mNavigationBarView == null || !mVisible) return;
 
         CustomTheme newTheme = mContext.getResources().getConfiguration().customTheme;
         if (newTheme != null &&
@@ -1209,6 +1209,15 @@ public class PhoneStatusBar extends BaseStatusBar {
         if (mClockView != null) {
             mClockView.setVisibility(show ? (mShowClock ? View.VISIBLE : View.GONE) : View.GONE);
         }
+    }
+
+    boolean mVisible = true;
+
+    public void toggleVisibility() {
+        final WindowManager wm = WindowManagerImpl.getDefault();
+        if (mVisible) wm.removeView(mNavigationBarView);
+        else addNavigationBar();
+        mVisible = !mVisible;
     }
 
     /**

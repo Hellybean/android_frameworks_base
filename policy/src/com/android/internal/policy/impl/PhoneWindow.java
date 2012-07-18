@@ -40,11 +40,14 @@ import com.android.internal.widget.ActionBarContextView;
 import com.android.internal.widget.ActionBarView;
 
 import android.app.KeyguardManager;
+import android.app.StatusBarManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.database.ContentObserver;
 import android.graphics.Canvas;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
@@ -57,6 +60,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.RemoteException;
 import android.os.ServiceManager;
+import android.provider.Settings;
 import android.util.AndroidRuntimeException;
 import android.util.DisplayMetrics;
 import android.util.EventLog;
@@ -192,6 +196,18 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
 
     private int mUiOptions = 0;
 
+    private SettingsObserver mSettingsObserver;
+    private int mGestureBottom;
+    private int mGestureTop;
+    private int mGestureLeft;
+    private int mGestureRight;
+    private boolean mGestureMove;
+    private int mGestureStart;
+    private int mGestureDistance;
+    private boolean mTabletMode;
+    private boolean mHasNavigationBar;
+    private boolean mDimDialogBackground;
+
     static class WindowManagerHolder {
         static final IWindowManager sWindowManager = IWindowManager.Stub.asInterface(
                 ServiceManager.getService("window"));
@@ -202,6 +218,8 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
     public PhoneWindow(Context context) {
         super(context);
         mLayoutInflater = LayoutInflater.from(context);
+        mSettingsObserver = new SettingsObserver();
+        updateGestureSettings();
     }
 
     @Override
@@ -1784,6 +1802,16 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
         private PopupWindow mActionModePopup;
         private Runnable mShowActionModePopup;
 
+        private boolean mSwipeRight = false;
+        private boolean mSwipeLeft = false;
+        private boolean mSwipeBottom = false;
+        private boolean mSwipeTop = false;
+        private int mSwipeStartRight;
+        private int mSwipeStartLeft;
+        private int mSwipeStartBottom;
+        private int mSwipeStartTop;
+        private StatusBarManager mSbm;
+
         public DecorView(Context context, int featureId) {
             super(context);
             mFeatureId = featureId;
@@ -1943,9 +1971,101 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
                     || y > (getHeight() + 5);
         }
 
+        private void performGesture(int index) {
+            if (mSbm == null) {
+                mSbm = (StatusBarManager)
+                        mContext.getSystemService(Context.STATUS_BAR_SERVICE);
+            }
+            switch (index) {
+                case 1:
+                    mSbm.expand();
+                    break;
+                case 2:
+                    mSbm.toggleVisibility();
+                    break;
+                case 3:
+                    mSbm.toggleRecentApps();
+                    break;
+                case 4:
+                    dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_BACK));
+                    dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_BACK));
+                    break;
+                case 5:
+                    Intent intent = new Intent("android.intent.action.MAIN");
+                    intent.addCategory("android.intent.category.HOME");
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    mContext.startActivity(intent);
+                    break;
+                case 6:
+                    dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MENU));
+                    dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_MENU));
+                    break;
+            }
+        }
+
         @Override
         public boolean onInterceptTouchEvent(MotionEvent event) {
             int action = event.getAction();
+
+            int topOffset = 0;
+            if (!mTabletMode || mContext.getResources().getConfiguration()
+                    .smallestScreenWidthDp < 600) {
+                 topOffset = mContext.getResources().getDimensionPixelSize(
+                        com.android.internal.R.dimen.status_bar_height);
+            }
+
+            int bottomOffset = 0;
+            if (!mTabletMode && mHasNavigationBar) {
+                 bottomOffset = mContext.getResources().getDimensionPixelSize(
+                        com.android.internal.R.dimen.navigation_bar_height);
+            }
+
+            if (mGestureBottom + mGestureLeft + mGestureRight + mGestureTop > 0) {
+                int x = (int)event.getX();
+                int y = (int)event.getY();
+                boolean handled = false;
+                if (action == MotionEvent.ACTION_DOWN) {
+                    if (mGestureBottom > 0 && y > getHeight() - mGestureStart - bottomOffset) {
+                        mSwipeBottom = true;
+                        mSwipeStartBottom = y;
+                    } else if (mGestureTop > 0 && y < mGestureStart + topOffset) {
+                        mSwipeTop = true;
+                        mSwipeStartTop = y;
+                    } else if (mGestureRight > 0 && x > getWidth() - mGestureStart) {
+                        mSwipeRight = true;
+                        mSwipeStartRight = x;
+                    } else if (mGestureLeft > 0 && x < mGestureStart) {
+                        mSwipeLeft = true;
+                        mSwipeStartLeft = x;
+                    }
+                } else if (action == MotionEvent.ACTION_UP) {
+                    if (mSwipeBottom && mSwipeStartBottom - y > mGestureDistance) {
+                        performGesture(mGestureBottom);
+                        handled = true;
+                    } else if (mSwipeTop && y > mGestureDistance + mSwipeStartTop) {
+                        performGesture(mGestureTop);
+                        handled = true;
+                    } else if (mSwipeRight && mSwipeStartRight - x > mGestureDistance) {
+                        performGesture(mGestureRight);
+                        handled = true;
+                    } else if (mSwipeLeft && x > mGestureDistance + mSwipeStartLeft) {
+                        performGesture(mGestureLeft);
+                        handled = true;
+                    }
+                    mSwipeRight = false;
+                    mSwipeLeft = false;
+                    mSwipeBottom = false;
+                    mSwipeTop = false;
+                    if (handled) {
+                        return true;
+                    }
+                } else if (action == MotionEvent.ACTION_MOVE && mGestureMove) {
+                    if (mSwipeRight || mSwipeLeft || mSwipeTop || mSwipeBottom) {
+                        return true;
+                    }
+                }
+            }
+
             if (mFeatureId >= 0) {
                 if (action == MotionEvent.ACTION_DOWN) {
                     int x = (int)event.getX();
@@ -2681,7 +2801,7 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
         }
 
         if (a.getBoolean(com.android.internal.R.styleable.Window_backgroundDimEnabled,
-                mIsFloating)) {
+                mIsFloating) && mDimDialogBackground) {
             /* All dialogs should have the window dimmed */
             if ((getForcedWindowFlags()&WindowManager.LayoutParams.FLAG_DIM_BEHIND) == 0) {
                 params.flags |= WindowManager.LayoutParams.FLAG_DIM_BEHIND;
@@ -3625,5 +3745,61 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
 
     void sendCloseSystemWindows(String reason) {
         PhoneWindowManager.sendCloseSystemWindows(getContext(), reason);
+    }
+
+    void updateGestureSettings() {
+        mGestureLeft = Settings.System.getInt(getContext().getContentResolver(),
+                Settings.System.EDGE_SWIPE_LEFT, 0);
+        mGestureTop = Settings.System.getInt(getContext().getContentResolver(),
+                Settings.System.EDGE_SWIPE_TOP, 0);
+        mGestureRight = Settings.System.getInt(getContext().getContentResolver(),
+                Settings.System.EDGE_SWIPE_RIGHT, 0);
+        mGestureBottom = Settings.System.getInt(getContext().getContentResolver(),
+                Settings.System.EDGE_SWIPE_BOTTOM, 0);
+        mGestureMove = Settings.System.getInt(getContext().getContentResolver(),
+                Settings.System.EDGE_SWIPE_MOVE, 0) == 1;
+        mGestureStart = Settings.System.getInt(getContext().getContentResolver(),
+                Settings.System.EDGE_SWIPE_START, 35);
+        mGestureDistance = Settings.System.getInt(getContext().getContentResolver(),
+                Settings.System.EDGE_SWIPE_DISTANCE, 40);
+        mTabletMode = Settings.System.getInt(getContext().getContentResolver(),
+                Settings.System.TABLET_MODE, 0) == 1;
+        mDimDialogBackground = Settings.System.getInt(getContext().getContentResolver(),
+                Settings.System.DIM_DIALOG_BG, 0) == 1;
+        boolean hasNavigationBar = getContext().getResources().getBoolean(
+                com.android.internal.R.bool.config_showNavigationBar);
+        mHasNavigationBar = Settings.System.getInt(getContext().getContentResolver(),
+                Settings.System.NAVIGATION_CONTROLS, hasNavigationBar ? 1 : 0) == 1;
+    }
+
+    private class SettingsObserver extends ContentObserver {
+
+        SettingsObserver() {
+            super(new Handler());
+            getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
+                Settings.System.EDGE_SWIPE_BOTTOM), false, this);
+            getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
+                Settings.System.EDGE_SWIPE_TOP), false, this);
+            getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
+                Settings.System.EDGE_SWIPE_RIGHT), false, this);
+            getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
+                Settings.System.EDGE_SWIPE_LEFT), false, this);
+            getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
+                Settings.System.EDGE_SWIPE_MOVE), false, this);
+            getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
+                Settings.System.EDGE_SWIPE_START), false, this);
+            getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
+                Settings.System.EDGE_SWIPE_DISTANCE), false, this);
+            getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
+                Settings.System.TABLET_MODE), false, this);
+            getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
+                Settings.System.DIM_DIALOG_BG), false, this);
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            super.onChange(selfChange);
+            updateGestureSettings();
+        }
     }
 }

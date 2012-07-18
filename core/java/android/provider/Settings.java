@@ -2342,6 +2342,66 @@ public final class Settings {
         public static final String POINTER_SPEED = "pointer_speed";
 
         /**
+
+         * Tablet mode override for sw600dp devices.
+         * @hide
+         */
+        public static final String TABLET_MODE = "tablet_mode";
+
+        /**
+         * Flip status bar notifications and buttons.
+         * @hide
+         */
+        public static final String TABLET_FLIPPED = "tablet_flipped";
+
+        /**
+         * Navigation controls.
+         * @hide
+         */
+        public static final String NAVIGATION_CONTROLS = "navigation_controls";
+
+        /**
+         * Dim dialog background.
+         * @hide
+         */
+        public static final String DIM_DIALOG_BG = "dim_dialog_bg";
+
+        /**
+         * @hide
+         */
+        public static final String EDGE_SWIPE_TOP = "edge_swipe_top";
+
+        /**
+         * @hide
+         */
+        public static final String EDGE_SWIPE_RIGHT = "edge_swipe_right";
+
+        /**
+         * @hide
+         */
+        public static final String EDGE_SWIPE_BOTTOM = "edge_swipe_bottom";
+
+        /**
+         * @hide
+         */
+        public static final String EDGE_SWIPE_LEFT = "edge_swipe_left";
+
+        /**
+         * @hide
+         */
+        public static final String EDGE_SWIPE_MOVE = "edge_swipe_move";
+
+        /**
+         * @hide
+         */
+        public static final String EDGE_SWIPE_START = "edge_swipe_start";
+
+        /**
+         * @hide
+         */
+        public static final String EDGE_SWIPE_DISTANCE = "edge_swipe_distance";
+
+        /**
          * Use the Notification Power Widget? (Who wouldn't!)
          *
          * @hide

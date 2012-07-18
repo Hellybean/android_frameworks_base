@@ -66,6 +66,8 @@ public class CommandQueue extends IStatusBar.Stub {
 
     private static final int MSG_SET_NAVIGATION_ICON_HINTS = 14 << MSG_SHIFT;
 
+    private static final int MSG_TOGGLE_VISIBLITY       = 15 << MSG_SHIFT;
+
     public static final int FLAG_EXCLUDE_NONE = 0;
     public static final int FLAG_EXCLUDE_SEARCH_PANEL = 1 << 0;
     public static final int FLAG_EXCLUDE_RECENTS_PANEL = 1 << 1;
@@ -106,6 +108,7 @@ public class CommandQueue extends IStatusBar.Stub {
         public void hideSearchPanel();
         public void cancelPreloadRecentApps();
         public void setNavigationIconHints(int hints);
+        public void toggleVisibility();
     }
 
     public CommandQueue(Callbacks callbacks, StatusBarIconList list) {
@@ -237,6 +240,13 @@ public class CommandQueue extends IStatusBar.Stub {
         }
     }
 
+    public void toggleVisibility() {
+        synchronized (mList) {
+            mHandler.removeMessages(MSG_TOGGLE_VISIBLITY);
+            mHandler.obtainMessage(MSG_TOGGLE_VISIBLITY, 0, 0, null).sendToTarget();
+        }
+    }
+
     private final class H extends Handler {
         public void handleMessage(Message msg) {
             final int what = msg.what & MSG_MASK;
@@ -314,6 +324,9 @@ public class CommandQueue extends IStatusBar.Stub {
                     break;
                 case MSG_SET_NAVIGATION_ICON_HINTS:
                     mCallbacks.setNavigationIconHints(msg.arg1);
+                    break;
+                case MSG_TOGGLE_VISIBLITY:
+                    mCallbacks.toggleVisibility();
                     break;
             }
         }

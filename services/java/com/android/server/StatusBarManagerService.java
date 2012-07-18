@@ -118,7 +118,7 @@ public class StatusBarManagerService extends IStatusBarService.Stub
     // From IStatusBarService
     // ================================================================================
     public void expand() {
-        enforceExpandStatusBar();
+        //enforceExpandStatusBar();
 
         if (mBar != null) {
             try {
@@ -134,6 +134,15 @@ public class StatusBarManagerService extends IStatusBarService.Stub
         if (mBar != null) {
             try {
                 mBar.animateCollapse();
+            } catch (RemoteException ex) {
+            }
+        }
+    }
+
+    public void toggleVisibility() {
+        if (mBar != null) {
+            try {
+                mBar.toggleVisibility();
             } catch (RemoteException ex) {
             }
         }

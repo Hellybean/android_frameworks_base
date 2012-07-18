@@ -48,6 +48,7 @@ public class DelegateViewHelper {
     }
 
     public boolean onInterceptTouchEvent(MotionEvent event) {
+        if (mBar == null) return false;
         if (mSourceView == null || mDelegateView == null
                 || mBar.shouldDisableNavbarGestures() || mBar.inKeyguardRestrictedInputMode()) {
             return false;

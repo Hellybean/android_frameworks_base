@@ -2431,6 +2431,13 @@ public final class Settings {
         public static final String NAV_BUTTONS = "nav_buttons";
 
         /**
+         * Navigation bars on the left side of the screen.
+         *
+         * @hide
+         */
+        public static final String NAVBAR_LEFT = "navigation_bar_left";
+
+        /**
         * Notification Power Widget - Custom Brightness Mode
         * @hide
         */

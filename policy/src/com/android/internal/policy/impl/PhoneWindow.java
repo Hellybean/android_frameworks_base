@@ -196,7 +196,6 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
 
     private int mUiOptions = 0;
 
-    private SettingsObserver mSettingsObserver;
     private int mGestureBottom;
     private int mGestureTop;
     private int mGestureLeft;
@@ -218,8 +217,6 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
     public PhoneWindow(Context context) {
         super(context);
         mLayoutInflater = LayoutInflater.from(context);
-        mSettingsObserver = new SettingsObserver();
-        updateGestureSettings();
     }
 
     @Override
@@ -1815,6 +1812,7 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
         public DecorView(Context context, int featureId) {
             super(context);
             mFeatureId = featureId;
+            updateGestureSettings();
         }
 
         @Override
@@ -2542,6 +2540,8 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
             if (cb != null && !isDestroyed() && mFeatureId < 0) {
                 cb.onWindowFocusChanged(hasWindowFocus);
             }
+
+            updateGestureSettings();
         }
 
         void updateWindowResizeState() {
@@ -3768,34 +3768,5 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
                 com.android.internal.R.bool.config_showNavigationBar);
         mHasNavigationBar = Settings.System.getInt(getContext().getContentResolver(),
                 Settings.System.NAVIGATION_CONTROLS, hasNavigationBar ? 1 : 0) == 1;
-    }
-
-    private class SettingsObserver extends ContentObserver {
-
-        SettingsObserver() {
-            super(new Handler());
-            getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
-                Settings.System.EDGE_SWIPE_BOTTOM), false, this);
-            getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
-                Settings.System.EDGE_SWIPE_TOP), false, this);
-            getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
-                Settings.System.EDGE_SWIPE_RIGHT), false, this);
-            getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
-                Settings.System.EDGE_SWIPE_LEFT), false, this);
-            getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
-                Settings.System.EDGE_SWIPE_MOVE), false, this);
-            getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
-                Settings.System.EDGE_SWIPE_START), false, this);
-            getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
-                Settings.System.EDGE_SWIPE_DISTANCE), false, this);
-            getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
-                Settings.System.DIM_DIALOG_BG), false, this);
-        }
-
-        @Override
-        public void onChange(boolean selfChange) {
-            super.onChange(selfChange);
-            updateGestureSettings();
-        }
     }
 }

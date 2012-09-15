@@ -58,6 +58,7 @@ import android.app.IActivityManager;
 import android.app.StatusBarManager;
 import android.app.admin.DevicePolicyManager;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -6430,7 +6431,15 @@ public class WindowManagerService extends IWindowManager.Stub
         sl = reduceConfigLayout(sl, Surface.ROTATION_90, density, unrotDh, unrotDw);
         sl = reduceConfigLayout(sl, Surface.ROTATION_180, density, unrotDw, unrotDh);
         sl = reduceConfigLayout(sl, Surface.ROTATION_270, density, unrotDh, unrotDw);
-        outConfig.smallestScreenWidthDp = (int)(mSmallestDisplayWidth / density);
+
+	ContentResolver resolver = mContext.getContentResolver();
+        boolean tabletModeOverride = Settings.System.getInt(resolver,
+                        Settings.System.TABLET_MODE, 0) == 1;
+            if (!tabletModeOverride) {
+                outConfig.smallestScreenWidthDp = (int)(mSmallestDisplayWidth / density);
+            } else {
+                outConfig.smallestScreenWidthDp = 721;
+            }
         outConfig.screenLayout = sl;
     }
 

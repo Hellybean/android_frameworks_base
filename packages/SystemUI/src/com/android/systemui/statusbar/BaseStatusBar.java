@@ -22,6 +22,7 @@ import android.app.ActivityManagerNative;
 import android.app.KeyguardManager;
 import android.app.Notification;
 import android.app.PendingIntent;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -190,6 +191,9 @@ public abstract class BaseStatusBar extends SystemUI implements
     private boolean mShowNotificationCounts;
 
     public void start() {
+        SettingsObserver observer = new SettingsObserver(mHandler);
+        observer.observe(mContext);
+
         mDisplay = ((WindowManager)mContext.getSystemService(Context.WINDOW_SERVICE))
                 .getDefaultDisplay();
 
@@ -975,5 +979,29 @@ public abstract class BaseStatusBar extends SystemUI implements
     public boolean inKeyguardRestrictedInputMode() {
         KeyguardManager km = (KeyguardManager) mContext.getSystemService(Context.KEYGUARD_SERVICE);
         return km.inKeyguardRestrictedInputMode();
+    }
+
+    private static class SettingsObserver extends ContentObserver {
+        private Handler mHandler;
+
+        SettingsObserver(Handler handler) {
+            super(handler);
+            mHandler = handler;
+        }
+
+        void observe(Context context) {
+            ContentResolver resolver = context.getContentResolver();
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.TABLET_MODE), false, this);
+//            resolver.registerContentObserver(Settings.System.getUriFor(
+//                    Settings.System.TABLET_FLIPPED), false, this);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.NAVIGATION_CONTROLS), false, this);
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            android.os.Process.killProcess(android.os.Process.myPid());
+        }
     }
 }

@@ -2341,29 +2341,7 @@ public final class Settings {
          */
         public static final String POINTER_SPEED = "pointer_speed";
 
-        /**
 
-         * Tablet mode override for sw600dp devices.
-         * @hide
-         */
-        public static final String TABLET_MODE = "tablet_mode";
-
-        /**
-         * Flip status bar notifications and buttons.
-         * @hide
-         */
-        public static final String TABLET_FLIPPED = "tablet_flipped";
-
-        /**
-         * Navigation controls.
-         * @hide
-         */
-        public static final String NAVIGATION_CONTROLS = "navigation_controls";
-
-        /**
-         * Dim dialog background.
-         * @hide
-         */
         public static final String DIM_DIALOG_BG = "dim_dialog_bg";
 
         /**

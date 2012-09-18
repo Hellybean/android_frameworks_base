@@ -2867,18 +2867,6 @@ public final class Settings {
          * Show the pending notification counts as overlays on the status bar
 
         /**
-         * Tablet mode override for sw600dp devices.
-         * @hide
-         */
-        public static final String TABLET_MODE = "tablet_mode";
-
-        /**
-         * Flip status bar notifications and buttons.
-         * @hide
-         */
-        //public static final String TABLET_FLIPPED = "tablet_flipped";
-
-        /**
          * Navigation controls.
          * @hide
          */

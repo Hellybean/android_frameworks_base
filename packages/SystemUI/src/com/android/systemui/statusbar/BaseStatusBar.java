@@ -992,10 +992,6 @@ public abstract class BaseStatusBar extends SystemUI implements
         void observe(Context context) {
             ContentResolver resolver = context.getContentResolver();
             resolver.registerContentObserver(Settings.System.getUriFor(
-                    Settings.System.TABLET_MODE), false, this);
-//            resolver.registerContentObserver(Settings.System.getUriFor(
-//                    Settings.System.TABLET_FLIPPED), false, this);
-            resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NAVIGATION_CONTROLS), false, this);
         }
 

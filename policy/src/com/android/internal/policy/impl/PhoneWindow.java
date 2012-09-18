@@ -3762,8 +3762,6 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
                 Settings.System.EDGE_SWIPE_START, 35);
         mGestureDistance = Settings.System.getInt(getContext().getContentResolver(),
                 Settings.System.EDGE_SWIPE_DISTANCE, 40);
-        mTabletMode = Settings.System.getInt(getContext().getContentResolver(),
-                Settings.System.TABLET_MODE, 0) == 1;
         mDimDialogBackground = Settings.System.getInt(getContext().getContentResolver(),
                 Settings.System.DIM_DIALOG_BG, 0) == 1;
         boolean hasNavigationBar = getContext().getResources().getBoolean(
@@ -3790,8 +3788,6 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
                 Settings.System.EDGE_SWIPE_START), false, this);
             getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
                 Settings.System.EDGE_SWIPE_DISTANCE), false, this);
-            getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
-                Settings.System.TABLET_MODE), false, this);
             getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
                 Settings.System.DIM_DIALOG_BG), false, this);
         }

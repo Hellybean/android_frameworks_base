@@ -2423,19 +2423,25 @@ public final class Settings {
         public static final String WIDGET_BUTTONS_TABLET = "expanded_widget_buttons_tablet";
 
         /**
-
          * Navigation controls to Use
          *
          * @hide
          */
         public static final String NAV_BUTTONS = "nav_buttons";
-
-        /**
+  
+      /**
          * Navigation bars on the left side of the screen.
          *
          * @hide
          */
         public static final String NAVBAR_LEFT = "navigation_bar_left";
+  
+      /**
+         * Height of navigation bar buttons
+         * @hide
+         */
+        public static final String NAV_BUTTONS_HEIGHT = "nav_buttons_height";
+
 
         /**
         * Notification Power Widget - Custom Brightness Mode

@@ -19,7 +19,6 @@ package com.android.systemui.recent;
 import android.animation.Animator;
 import android.animation.LayoutTransition;
 import android.app.ActivityManager;
-import android.app.ActivityManager.MemoryInfo;
 import android.app.ActivityManagerNative;
 import android.app.ActivityOptions;
 import android.content.Context;
@@ -37,7 +36,6 @@ import android.net.Uri;
 import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.provider.Settings;
-import android.text.format.Formatter;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Display;
@@ -59,8 +57,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.PopupMenu;
-import android.widget.ProgressBar;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.android.systemui.R;
@@ -93,7 +89,6 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
     OnRecentsPanelVisibilityChangedListener mVisibilityChangedListener;
 
     ImageView mPlaceholderThumbnail;
-    ProgressBar mRamUsage;
     View mTransitionBg;
     boolean mHideRecentsAfterThumbnailScaleUpStarted;
 
@@ -499,17 +494,6 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
         mRecentsScrim = findViewById(R.id.recents_bg_protect);
         mRecentsNoApps = findViewById(R.id.recents_no_apps);
         mChoreo = new Choreographer(this, mRecentsScrim, mRecentsContainer, mRecentsNoApps, this);
-
-        mRamUsage = (ProgressBar) findViewById(R.id.recents_ram_usage);
-
-        // Get the current memory information
-        ActivityManager am = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
-        MemoryInfo mi = new MemoryInfo();
-        am.getMemoryInfo(mi);
-
-        // Set the used ram percent as progress on the bar
-        int ramProg = Math.round(mi.availMem * 100 / mi.totalMem);
-        mRamUsage.setProgress(ramProg);
 
         if (mRecentsScrim != null) {
             Display d = ((WindowManager)mContext.getSystemService(Context.WINDOW_SERVICE))

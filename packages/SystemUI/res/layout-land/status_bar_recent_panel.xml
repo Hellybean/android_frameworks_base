@@ -78,13 +78,6 @@
             android:layout_width="wrap_content"
             android:text="@string/recents_kill_all_button_text"/>
 
-        <ProgressBar style="?android:attr/progressBarStyleHorizontal"
-            android:id="@+id/recents_ram_usage"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            android:max="100" />
-
         <com.android.systemui.recent.MemoryInfoView
             android:id="@+id/memory_info"
             android:layout_width="350dip"

@@ -2443,6 +2443,13 @@ public final class Settings {
         public static final String NAV_BUTTONS_HEIGHT = "nav_buttons_height";
 
 
+      /**
+         * Timeout for longpress back kill
+         * @hide
+         */
+        public static final String KILL_APP_LONGPRESS_TIMEOUT = "kill_app_longpress_timeout";
+
+
         /**
         * Notification Power Widget - Custom Brightness Mode
         * @hide

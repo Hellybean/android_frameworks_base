@@ -2699,6 +2699,12 @@ public final class Settings {
         public static final String LOCKSCREEN_BACKGROUND = "lockscreen_background";
 
         /**
+         * Allows to show the background activity back the lockscreen
+         * @hide
+         */
+        public static final String LOCKSCREEN_SEE_THROUGH = "lockscreen_see_through";
+
+        /**
          * Show the weather on the lock screen
          * @hide
          */

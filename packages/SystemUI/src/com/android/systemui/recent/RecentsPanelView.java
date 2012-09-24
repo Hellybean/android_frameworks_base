@@ -539,11 +539,9 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
 
         mUpdateMemInfoRunnable = new Runnable() {
             public void run() {
-                if (mMemoryInfoView != null) {
-                    mMemoryInfoView.update();
-                    if (mShowing)
-                        postDelayed(mUpdateMemInfoRunnable, 500);
-                }
+                mMemoryInfoView.update();
+                if (mShowing)
+                    postDelayed(mUpdateMemInfoRunnable, 500);
             }
         };
     }

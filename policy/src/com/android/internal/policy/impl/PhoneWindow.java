@@ -3829,7 +3829,9 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
         mHasNavigationBar = Settings.System.getInt(getContext().getContentResolver(),
                 Settings.System.NAVIGATION_CONTROLS, hasNavigationBar ? 1 : 0) == 1;
         mFullscreenMode = Settings.System.getInt(getContext().getContentResolver(),
-                Settings.System.FULLSCREEN_MODE, 0) == 1;
+                Settings.System.FULLSCREEN_MODE, 0) == 1 ||
+                Settings.System.getInt(getContext().getContentResolver(),
+                Settings.System.STATUS_BAR_TOGGLED, 0) == 1;
         mStatusBarTimeout = Settings.System.getInt(getContext().getContentResolver(),
                 Settings.System.FULLSCREEN_TIMEOUT, 2) * 1000;
         mBlacklist = Settings.System.getString(getContext().getContentResolver(),

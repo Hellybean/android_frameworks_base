@@ -2440,6 +2440,11 @@ public final class Settings {
         public static final String EDGE_SWIPE_BLACKLIST = "edge_swipe_blacklist";
 
         /**
+         * @hide
+         */
+        public static final String STATUS_BAR_TOGGLED = "status_bar_toggled";
+
+        /**
          * Use the Notification Power Widget? (Who wouldn't!)
          *
          * @hide

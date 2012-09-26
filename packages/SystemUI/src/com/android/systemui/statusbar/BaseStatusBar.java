@@ -999,6 +999,8 @@ public abstract class BaseStatusBar extends SystemUI implements
             ContentResolver resolver = context.getContentResolver();
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NAVIGATION_CONTROLS), false, this);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_CLOCK_COLOR), false, this);
         }
 
         @Override

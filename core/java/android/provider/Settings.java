@@ -2378,6 +2378,36 @@ public final class Settings {
          * @hide
          */
         public static final String EDGE_SWIPE_DISTANCE = "edge_swipe_distance";
+	
+         /**
+         * @hide
+         */
+        public static final String STATUS_BAR_CLOCK_COLOR = "status_bar_clock_color";
+
+        /**
+         * The color tint of the navigation buttons in the tablet combined bar.
+         * default: none
+         * @hide
+         */
+        public static final String COMBINED_BAR_NAVIGATION_COLOR = "combined_bar_navigation_color";
+
+        /**
+        * CombinedBar navigation glow on tablets.
+        * @hide
+        */
+        public static final String COMBINED_BAR_NAVIGATION_GLOW = "combined_bar_navigation_glow";
+
+        /**
+        * CombinedBar navigation glow time on tablets.
+        * @hide
+        */
+        public static final String COMBINED_BAR_NAVIGATION_GLOW_TIME = "combined_bar_navigation_glow_time";
+
+        /**
+        * CombinedBar navigation glow color on tablets.
+        * @hide
+        */
+        public static final String COMBINED_BAR_NAVIGATION_GLOW_COLOR = "combined_bar_navigation_glow_color";
 
         /**
          * Use the Notification Power Widget? (Who wouldn't!)

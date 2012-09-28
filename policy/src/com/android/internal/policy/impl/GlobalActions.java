@@ -34,6 +34,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.UserInfo;
 import android.database.ContentObserver;
+import android.hardware.input.InputManager;
 import android.media.AudioManager;
 import android.net.ConnectivityManager;
 import android.os.Handler;
@@ -41,6 +42,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
 import android.os.ServiceManager;
+import android.os.SystemClock;
 import android.os.SystemProperties;
 import android.os.Vibrator;
 import android.provider.Settings;
@@ -50,9 +52,13 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.IWindowManager;
 import android.view.LayoutInflater;
+import android.view.InputDevice;
+import android.view.KeyCharacterMap;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.IWindowManager;
 import android.view.WindowManagerPolicy.WindowManagerFuncs;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
@@ -97,6 +103,7 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
 
     private Action mSilentModeAction;
     private ToggleAction mAirplaneModeOn;
+    private NavBarAction mNavBarHideToggle;
 
     private MyAdapter mAdapter;
 
@@ -197,6 +204,9 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
         } else {
             mSilentModeAction = new SilentModeTriStateAction(mContext, mAudioManager, mHandler);
         }
+
+        mNavBarHideToggle = new NavBarAction(mHandler, mStatusBarManager);
+
         mAirplaneModeOn = new ToggleAction(
                 R.drawable.ic_lock_airplane_mode,
                 R.drawable.ic_lock_airplane_mode_off,
@@ -391,6 +401,12 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
                 };
                 mItems.add(switchToUser);
             }
+        }
+
+        // Next NavBar Hide
+        if (Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.POWER_MENU_NAV_CONTROLS_ENABLED, 0) == 1) {
+            mItems.add(mNavBarHideToggle);
         }
 
         // last: silent mode
@@ -1009,6 +1025,117 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
             mAudioManager.setRingerMode(indexToRingerMode(index));
             mHandler.sendEmptyMessageDelayed(MESSAGE_DISMISS, DIALOG_DISMISS_DELAY);
         }
+    }
+
+    private static class NavBarAction implements Action, View.OnClickListener {
+
+        private final int[] ITEM_IDS = { R.id.navbarback, R.id.navbarhome, R.id.navbarrecent, R.id.navbarmenu };
+
+        public Context mContext;
+        public boolean mNavbarVisible;
+        private final Handler mHandler;
+        private int mInjectKeycode;
+        long mDownTime;
+        StatusBarManager mStatusBarManager;
+
+        NavBarAction(Handler handler, StatusBarManager sbm) {
+            mHandler = handler;
+            mStatusBarManager = sbm;
+        }
+
+
+        public View create(Context context, View convertView, ViewGroup parent,
+                LayoutInflater inflater) {
+            mContext = context;
+
+            View v = inflater.inflate(R.layout.global_actions_navbar_mode, parent, false);
+
+            for (int i = 0; i < 4; i++) {
+                View itemView = v.findViewById(ITEM_IDS[i]);
+                // Set up click handler
+                itemView.setTag(i);
+                itemView.setOnClickListener(this);
+            }
+            return v;
+        }
+
+        public void onPress() {
+        }
+
+        public boolean onLongPress() {
+            return false;
+        }
+
+        public boolean showDuringKeyguard() {
+            return false;
+        }
+
+        public boolean showBeforeProvisioning() {
+            return false;
+        }
+
+        public boolean isEnabled() {
+            return true;
+        }
+
+        void willCreate() {
+        }
+
+        public void onClick(View v) {
+            if (!(v.getTag() instanceof Integer)) return;
+
+            int index = (Integer) v.getTag();
+
+            switch (index) {
+
+            case 0:
+                injectKeyDelayed(KeyEvent.KEYCODE_BACK,SystemClock.uptimeMillis());
+                break;
+
+            case 1:
+                injectKeyDelayed(KeyEvent.KEYCODE_HOME,SystemClock.uptimeMillis());
+                break;
+
+            case 2:
+                mStatusBarManager.toggleRecentApps();
+                break;
+
+            case 3:
+                injectKeyDelayed(KeyEvent.KEYCODE_MENU,SystemClock.uptimeMillis());
+                break;
+            }
+        }
+        public void injectKeyDelayed(int keycode,long downtime){
+            mInjectKeycode = keycode;
+            mDownTime = downtime;
+            mHandler.sendEmptyMessage(MESSAGE_DISMISS);
+            mHandler.removeCallbacks(onInjectKey_Down);
+            mHandler.removeCallbacks(onInjectKey_Up);
+            mHandler.postDelayed(onInjectKey_Down,25);// wait a few ms to let Dialog dismiss
+            mHandler.postDelayed(onInjectKey_Up,50); // introduce small delay to handle key press
+        }
+
+        final Runnable onInjectKey_Down = new Runnable() {
+            public void run() {
+                final KeyEvent ev = new KeyEvent(mDownTime, SystemClock.uptimeMillis(), KeyEvent.ACTION_DOWN, mInjectKeycode, 0,
+                        0, KeyCharacterMap.VIRTUAL_KEYBOARD, 0,
+                        KeyEvent.FLAG_FROM_SYSTEM | KeyEvent.FLAG_VIRTUAL_HARD_KEY,
+                        InputDevice.SOURCE_KEYBOARD);
+                InputManager.getInstance().injectInputEvent(ev,
+                        InputManager.INJECT_INPUT_EVENT_MODE_WAIT_FOR_RESULT);
+            }
+        };
+
+        final Runnable onInjectKey_Up = new Runnable() {
+            public void run() {
+                final KeyEvent ev = new KeyEvent(mDownTime, SystemClock.uptimeMillis(), KeyEvent.ACTION_UP, mInjectKeycode, 0,
+                        0, KeyCharacterMap.VIRTUAL_KEYBOARD, 0,
+                        KeyEvent.FLAG_FROM_SYSTEM | KeyEvent.FLAG_VIRTUAL_HARD_KEY,
+                        InputDevice.SOURCE_KEYBOARD);
+                InputManager.getInstance().injectInputEvent(ev,
+                        InputManager.INJECT_INPUT_EVENT_MODE_WAIT_FOR_RESULT);
+            }
+        };
     }
 
     private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {

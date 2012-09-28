@@ -2410,6 +2410,11 @@ public final class Settings {
         public static final String COMBINED_BAR_NAVIGATION_GLOW_COLOR = "combined_bar_navigation_glow_color";
 
         /**
+         * @hide
+         */
+        public static final String EDGE_SWIPE_BLACKLIST = "edge_swipe_blacklist";
+
+        /**
          * Use the Notification Power Widget? (Who wouldn't!)
          *
          * @hide
@@ -2847,6 +2852,12 @@ public final class Settings {
          * @hide
          */
         public static final String POWER_MENU_SILENT_ENABLED = "power_menu_silent_enabled";
+
+        /**
+         * @hide
+         */
+        public static final String POWER_MENU_NAV_CONTROLS_ENABLED = "power_menu_nav_controls_enabled";
+
 
         /**
          * Whether to enable custom rebindings of the actions performed on

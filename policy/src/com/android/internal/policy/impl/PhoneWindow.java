@@ -39,6 +39,8 @@ import com.android.internal.widget.ActionBarContainer;
 import com.android.internal.widget.ActionBarContextView;
 import com.android.internal.widget.ActionBarView;
 
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.KeyguardManager;
 import android.app.StatusBarManager;
 import android.content.Context;
@@ -99,6 +101,7 @@ import android.widget.TextView;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Android-specific Window.
@@ -206,6 +209,7 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
     private boolean mTabletMode;
     private boolean mHasNavigationBar;
     private boolean mDimDialogBackground;
+    private String mBlacklist;
 
     static class WindowManagerHolder {
         static final IWindowManager sWindowManager = IWindowManager.Stub.asInterface(
@@ -2003,6 +2007,19 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
 
         @Override
         public boolean onInterceptTouchEvent(MotionEvent event) {
+            boolean blacklisted = false;
+
+            if (mBlacklist != null) {
+                ActivityManager activityManager =
+                        (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
+                List<RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
+                for (RunningAppProcessInfo appProcess : appProcesses) {
+                    if (appProcess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+                        if (mBlacklist.contains(appProcess.processName)) blacklisted = true;
+                    }
+                }
+            }
+
             int action = event.getAction();
 
             int topOffset = 0;
@@ -2018,7 +2035,7 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
                         com.android.internal.R.dimen.navigation_bar_height);
             }
 
-            if (mGestureBottom + mGestureLeft + mGestureRight + mGestureTop > 0) {
+            if (!blacklisted && mGestureBottom + mGestureLeft + mGestureRight + mGestureTop > 0) {
                 int x = (int)event.getX();
                 int y = (int)event.getY();
                 boolean handled = false;
@@ -3768,5 +3785,7 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
                 com.android.internal.R.bool.config_showNavigationBar);
         mHasNavigationBar = Settings.System.getInt(getContext().getContentResolver(),
                 Settings.System.NAVIGATION_CONTROLS, hasNavigationBar ? 1 : 0) == 1;
+        mBlacklist = Settings.System.getString(getContext().getContentResolver(),
+                Settings.System.EDGE_SWIPE_BLACKLIST);
     }
 }

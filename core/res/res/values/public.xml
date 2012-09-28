@@ -3933,4 +3933,11 @@
   <!-- HW rotation lock -->
   <java-symbol type="string" name="toast_rotation_unlocked" />
   <java-symbol type="string" name="toast_rotation_locked" />
+
+  <!-- Hide Navbar -->
+  <java-symbol type="layout" name="global_actions_navbar_mode" />
+  <java-symbol type="id" name="navbarrecent" />
+  <java-symbol type="id" name="navbarhome" />
+  <java-symbol type="id" name="navbarback" />
+  <java-symbol type="id" name="navbarmenu" />
 </resources>

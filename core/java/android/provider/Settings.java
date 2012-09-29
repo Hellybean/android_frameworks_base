@@ -2478,6 +2478,13 @@ public final class Settings {
         public static final String NAV_BUTTONS_HEIGHT = "nav_buttons_height";
 
 
+         /**
+         * User interface mode. This is used to change the UI mode forcing it to
+         * Change into tablet mode. Default is disabled. 
+         */
+        public static final String MODE_TABLET_UI = "mode_tabletui";
+
+
       /**
          * Timeout for longpress back kill
          * @hide

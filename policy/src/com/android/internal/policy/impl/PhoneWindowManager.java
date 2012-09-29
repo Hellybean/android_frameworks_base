@@ -685,6 +685,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NAV_BUTTONS_HEIGHT), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.MODE_TABLET_UI), false, this);
+            resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.KILL_APP_LONGPRESS_TIMEOUT), false, this);
             if (SEPARATE_TIMEOUT_FOR_SCREEN_SAVER) {
                 resolver.registerContentObserver(Settings.Secure.getUriFor(
@@ -1303,6 +1305,13 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
         ContentResolver resolver = mContext.getContentResolver();
 
+        // tabletui switch
+//        boolean mTabletui = Settings.System.getBoolean(mContext.getContentResolver(), Settings.System.MODE_TABLET_UI, false);
+        boolean mTabletui = Settings.System.getInt(resolver,
+                        Settings.System.MODE_TABLET_UI, 0) == 1;
+
+        if (!mTabletui) {
+
         if (shortSizeDp < 600) {
             // 0-599dp: "phone" UI with a separate status & navigation bar
             mHasSystemNavBar = false;
@@ -1316,6 +1325,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             mHasSystemNavBar = true;
             mNavigationBarCanMove = false;
         }
+         } else {
+          mHasSystemNavBar = true;
+          mNavigationBarCanMove = false;
+         }
 
         if (!mHasSystemNavBar) {
             mHasNavigationBar = mContext.getResources().getBoolean(

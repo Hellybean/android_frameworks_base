@@ -2484,11 +2484,6 @@ public final class Settings {
          */
         public static final String MODE_TABLET_UI = "mode_tabletui";
 
-        /**
-         * User interface mode. This is used to change from singlepane mode forcing it to
-         * Change into multipane mode. Default is disabled. 
-         */
-        public static final String FORCE_DUAL_PANEL = "force_dualpanel";
 
       /**
          * Timeout for longpress back kill

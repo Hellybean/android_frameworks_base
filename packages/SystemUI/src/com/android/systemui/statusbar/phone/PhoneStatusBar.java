@@ -1220,7 +1220,7 @@ public class PhoneStatusBar extends BaseStatusBar {
                 Settings.System.STATUS_BAR_CLOCK_COLOR, 0xFF33B5E5);
         ContentResolver resolver = mContext.getContentResolver();
 
-        View cclock = mStatusBarView.findViewById(R.id.center_clock);
+        TextView cclock = (TextView) mStatusBarView.findViewById(R.id.center_clock);
         boolean rightClock = (Settings.System.getInt(resolver, Settings.System.STATUS_BAR_CLOCK, 1) == 1);
         boolean centerClock = (Settings.System.getInt(resolver, Settings.System.STATUS_BAR_CLOCK, 1) == 2);
         if (rightClock && mClockView != null) {
@@ -1228,7 +1228,7 @@ public class PhoneStatusBar extends BaseStatusBar {
            	mClockView.setVisibility(show ? View.VISIBLE : View.GONE);
         }
         if (centerClock && cclock != null) {
-		mClockView.setTextColor(clockColor);
+		cclock.setTextColor(clockColor);
                 cclock.setVisibility(show ? View.VISIBLE : View.GONE);
         }
     }

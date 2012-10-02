@@ -58,6 +58,7 @@ import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.content.pm.PackageManager;
 
 import com.android.systemui.R;
 import com.android.systemui.statusbar.BaseStatusBar;
@@ -93,6 +94,7 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
     boolean mHideRecentsAfterThumbnailScaleUpStarted;
 
     private Button mRecentsKillAllButton;
+    private Button mRecentsTaskManagerButton;
 
     private RecentTasksLoader mRecentTasksLoader;
     private ArrayList<TaskDescription> mRecentTaskDescriptions;
@@ -518,6 +520,23 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
             }
         }
 
+
+        boolean recent_task_manager_button = true;
+
+        mRecentsTaskManagerButton = (Button) findViewById(R.id.recents_task_manager_button);
+        if (mRecentsTaskManagerButton != null){
+            if (recent_task_manager_button){ //set the listener
+                mRecentsTaskManagerButton.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        opentaskmanager();
+                    }
+                });
+            } else { // hide the button completely (gone)
+                mRecentsTaskManagerButton.setVisibility(View.GONE);
+            }
+        }
+
         mPreloadTasksRunnable = new Runnable() {
             public void run() {
                 // If we set our visibility to INVISIBLE here, we avoid an extra call to
@@ -928,5 +947,14 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
             mRecentTaskDescriptions.clear();
         }
         hide(false);
+    }
+
+    private void opentaskmanager() {
+    	PackageManager pm = getContext().getPackageManager();
+    	Intent appStartIntent = pm.getLaunchIntentForPackage("com.eolwral.osmonitor");
+    	if (null != appStartIntent)
+    	{
+    	    getContext().startActivity(appStartIntent);
+    	}
     }
 }

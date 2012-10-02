@@ -428,4 +428,6 @@
 
     <string name="recents_kill_all_button_text">Kill all</string>
 
+    <string name="recents_task_manager_button_text">Task Manager</string>
+
 </resources>

@@ -3280,6 +3280,14 @@ public final class Settings {
          * @hide
          */
         public static final String RECENT_KILL_ALL_BUTTON = "recent_kill_all_button";
+
+
+        /**
+         * whether to hide the tasmanager-button on recent switcher
+         *
+         * @hide
+         */
+        public static final String RECENT_TASK_MANAGER_BUTTON = "recent_task_manager_button";
     }
 
     /**

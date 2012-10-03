@@ -1219,13 +1219,18 @@ public class PhoneStatusBar extends BaseStatusBar {
         int clockColor = Settings.System.getInt(mContext.getContentResolver(),
                 Settings.System.STATUS_BAR_CLOCK_COLOR, 0xFF33B5E5);
         ContentResolver resolver = mContext.getContentResolver();
-
+        mShowClock = (Settings.System.getInt(resolver,
+                Settings.System.STATUS_BAR_CLOCK, 1) == 1);
+        if (mClockView != null) {
+            mClockView.setVisibility(show ? (mShowClock ? View.VISIBLE : View.GONE) : View.GONE);
+        }
+        TextView clock = (TextView) mStatusBarView.findViewById(R.id.clock);
         TextView cclock = (TextView) mStatusBarView.findViewById(R.id.center_clock);
         boolean rightClock = (Settings.System.getInt(resolver, Settings.System.STATUS_BAR_CLOCK, 1) == 1);
         boolean centerClock = (Settings.System.getInt(resolver, Settings.System.STATUS_BAR_CLOCK, 1) == 2);
-        if (rightClock && mClockView != null) {
-		mClockView.setTextColor(clockColor);
-           	mClockView.setVisibility(show ? View.VISIBLE : View.GONE);
+        if (rightClock && clock != null) {
+	    clock.setTextColor(clockColor);
+            clock.setVisibility(show ? View.VISIBLE : View.GONE);
         }
         if (centerClock && cclock != null) {
 		cclock.setTextColor(clockColor);

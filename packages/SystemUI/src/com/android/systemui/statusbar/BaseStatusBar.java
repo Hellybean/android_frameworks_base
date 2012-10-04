@@ -1007,5 +1007,9 @@ public abstract class BaseStatusBar extends SystemUI implements
         public void onChange(boolean selfChange) {
             android.os.Process.killProcess(android.os.Process.myPid());
         }
+
+    }
+    public boolean isTablet() {
+        return false;
     }
 }

@@ -2480,10 +2480,6 @@ public final class Settings {
          /**
          * User interface mode. This is used to change the UI mode forcing it to
          * Change into tablet mode. Default is disabled. 
-         * 0: don't overwrite ui
-         * 1: force phablet ui
-         * 2: force tablet ui
-         * default: 0
          */
         public static final String MODE_TABLET_UI = "mode_tabletui";
 

@@ -1306,11 +1306,12 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         ContentResolver resolver = mContext.getContentResolver();
 
         // tabletui switch
-//        boolean mTabletui = Settings.System.getBoolean(mContext.getContentResolver(), Settings.System.MODE_TABLET_UI, false);
-        boolean mTabletui = Settings.System.getInt(resolver,
+        boolean mPhabletui = Settings.System.getInt(resolver,
                         Settings.System.MODE_TABLET_UI, 0) == 1;
+        boolean mTabletui = Settings.System.getInt(resolver,
+                        Settings.System.MODE_TABLET_UI, 0) == 2;
 
-        if (!mTabletui) {
+        if (!mTabletui && !mPhabletui) {
 
         if (shortSizeDp < 600) {
             // 0-599dp: "phone" UI with a separate status & navigation bar
@@ -1325,8 +1326,11 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             mHasSystemNavBar = true;
             mNavigationBarCanMove = false;
         }
-         } else {
+         } else if (mTabletui) {
           mHasSystemNavBar = true;
+          mNavigationBarCanMove = false;
+         } else if (mPhabletui) {
+          mHasSystemNavBar = false;
           mNavigationBarCanMove = false;
          }
 

@@ -6434,11 +6434,15 @@ public class WindowManagerService extends IWindowManager.Stub
 
         // tabletui switch
 	ContentResolver resolver = mContext.getContentResolver();
-        boolean mTabletui = Settings.System.getInt(resolver,
+        boolean mPhabletui = Settings.System.getInt(resolver,
                         Settings.System.MODE_TABLET_UI, 0) == 1;
-            if (!mTabletui) {
+        boolean mTabletui = Settings.System.getInt(resolver,
+                        Settings.System.MODE_TABLET_UI, 0) == 2;
+            if (!mTabletui && !mPhabletui) {
                 outConfig.smallestScreenWidthDp = (int)(mSmallestDisplayWidth / density);
-            } else {
+            } else if (!mPhabletui){
+                outConfig.smallestScreenWidthDp = 601;
+            } else if (!mTabletui){
                 outConfig.smallestScreenWidthDp = 721;
             }
         outConfig.screenLayout = sl;

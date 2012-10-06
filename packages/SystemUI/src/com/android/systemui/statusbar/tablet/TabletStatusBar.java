@@ -409,9 +409,26 @@ public class TabletStatusBar extends BaseStatusBar implements
 
     private void recreateStatusBar() {
         mRecreating = true;
-        mHandler.removeMessages(MSG_RECREATE);
-        mHandler.sendEmptyMessage(MSG_RECREATE);
-        mHandler.sendEmptyMessageDelayed(MSG_RECREATE, 500);
+        mStatusBarContainer.removeAllViews();
+
+        // extract notifications.
+        int nNotifs = mNotificationData.size();
+        ArrayList<Pair<IBinder, StatusBarNotification>> notifications =
+                new ArrayList<Pair<IBinder, StatusBarNotification>>(nNotifs);
+        copyNotifications(notifications, mNotificationData);
+        mNotificationData.clear();
+
+        mStatusBarContainer.addView(makeStatusBarView());
+
+        // recreate notifications.
+        for (int i = 0; i < nNotifs; i++) {
+            Pair<IBinder, StatusBarNotification> notifData = notifications.get(i);
+            addNotificationViews(notifData.first, notifData.second);
+        }
+
+        setAreThereNotifications();
+
+        mRecreating = false;
     }
 
 

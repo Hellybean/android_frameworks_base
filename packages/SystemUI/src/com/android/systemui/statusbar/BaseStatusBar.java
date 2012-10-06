@@ -86,7 +86,6 @@ public abstract class BaseStatusBar extends SystemUI implements
     protected static final int MSG_CLOSE_SEARCH_PANEL = 1025;
     protected static final int MSG_SHOW_INTRUDER = 1026;
     protected static final int MSG_HIDE_INTRUDER = 1027;
-    protected static final int MSG_RECREATE = 1028;
 
     protected static final boolean ENABLE_INTRUDERS = false;
 
@@ -519,9 +518,6 @@ public abstract class BaseStatusBar extends SystemUI implements
                  if (mSearchPanelView != null && mSearchPanelView.isShowing()) {
                      mSearchPanelView.show(false, true);
                  }
-                 break;
-             case MSG_RECREATE:
-                 mCommandQueue.toggleVisibility();
                  break;
             }
         }
@@ -993,7 +989,6 @@ public abstract class BaseStatusBar extends SystemUI implements
 
     private static class SettingsObserver extends ContentObserver {
         private Handler mHandler;
-        private ContentResolver mResolver;
 
         SettingsObserver(Handler handler) {
             super(handler);
@@ -1001,22 +996,16 @@ public abstract class BaseStatusBar extends SystemUI implements
         }
 
         void observe(Context context) {
-            mResolver = context.getContentResolver();
-            mResolver.registerContentObserver(Settings.System.getUriFor(
+            ContentResolver resolver = context.getContentResolver();
+            resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NAVIGATION_CONTROLS), false, this);
-            mResolver.registerContentObserver(Settings.System.getUriFor(
+            resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_CLOCK_COLOR), false, this);
         }
 
         @Override
-        public void onChange(boolean selfChange, Uri uri) {
-            if (uri.equals(Settings.System.getUriFor(Settings.System.MODE_TABLET_UI))) {
-                android.os.Process.killProcess(android.os.Process.myPid());
-            } else {
-                mHandler.removeMessages(MSG_RECREATE);
-                mHandler.sendEmptyMessage(MSG_RECREATE);
-                mHandler.sendEmptyMessageDelayed(MSG_RECREATE, 500);
-            }
+        public void onChange(boolean selfChange) {
+            android.os.Process.killProcess(android.os.Process.myPid());
         }
 
     }

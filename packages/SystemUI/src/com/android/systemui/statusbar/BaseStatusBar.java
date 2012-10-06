@@ -192,6 +192,9 @@ public abstract class BaseStatusBar extends SystemUI implements
     private boolean mShowNotificationCounts;
 
     public void start() {
+        SettingsObserver observer = new SettingsObserver(mHandler);
+        observer.observe(mContext);
+
         mDisplay = ((WindowManager)mContext.getSystemService(Context.WINDOW_SERVICE))
                 .getDefaultDisplay();
 
@@ -202,9 +205,6 @@ public abstract class BaseStatusBar extends SystemUI implements
 
         mWindowManager = IWindowManager.Stub.asInterface(
                 ServiceManager.getService(Context.WINDOW_SERVICE));
-
-        SettingsObserver observer = new SettingsObserver(mHandler, mWindowManager);
-        observer.observe(mContext);
 
         mBarService = IStatusBarService.Stub.asInterface(
                 ServiceManager.getService(Context.STATUS_BAR_SERVICE));
@@ -994,12 +994,10 @@ public abstract class BaseStatusBar extends SystemUI implements
     private static class SettingsObserver extends ContentObserver {
         private Handler mHandler;
         private ContentResolver mResolver;
-        private IWindowManager mWm;
 
-        SettingsObserver(Handler handler, IWindowManager wm) {
+        SettingsObserver(Handler handler) {
             super(handler);
             mHandler = handler;
-            mWm = wm;
         }
 
         void observe(Context context) {
@@ -1012,16 +1010,7 @@ public abstract class BaseStatusBar extends SystemUI implements
 
         @Override
         public void onChange(boolean selfChange, Uri uri) {
-            boolean hasNavBar = false;
-            try {
-                hasNavBar = mWm.hasNavigationBar();
-            } catch (Exception e) {
-            }
-
             if (uri.equals(Settings.System.getUriFor(Settings.System.MODE_TABLET_UI))) {
-                android.os.Process.killProcess(android.os.Process.myPid());
-            } else if (uri.equals(Settings.System.getUriFor(Settings.System.NAVIGATION_CONTROLS))
-                    && hasNavBar) {
                 android.os.Process.killProcess(android.os.Process.myPid());
             } else {
                 mHandler.removeMessages(MSG_RECREATE);

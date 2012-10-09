@@ -1001,6 +1001,10 @@ public abstract class BaseStatusBar extends SystemUI implements
                     Settings.System.NAVIGATION_CONTROLS), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_CLOCK_COLOR), false, this);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.STATUS_BAR_COLOR), false, this);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.NOTIFICATION_PANEL_COLOR), false, this);
         }
 
         @Override

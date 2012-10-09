@@ -2385,6 +2385,16 @@ public final class Settings {
         public static final String STATUS_BAR_CLOCK_COLOR = "status_bar_clock_color";
 
         /**
+         * @hide
+         */
+        public static final String STATUS_BAR_COLOR = "status_bar_color";
+
+        /**
+         * @hide
+         */
+        public static final String NOTIFICATION_PANEL_COLOR = "notification_panel_color";
+
+        /**
          * The color tint of the navigation buttons in the tablet combined bar.
          * default: none
          * @hide

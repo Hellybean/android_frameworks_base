@@ -56,7 +56,6 @@ public class SettingsView extends LinearLayout implements View.OnClickListener {
 
         mDoNotDisturb = new DoNotDisturbController(context,
                 (CompoundButton)findViewById(R.id.do_not_disturb_checkbox));
-
         findViewById(R.id.settings).setOnClickListener(this);
     }
 

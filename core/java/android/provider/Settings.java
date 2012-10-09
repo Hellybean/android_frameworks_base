@@ -2395,6 +2395,11 @@ public final class Settings {
         public static final String NOTIFICATION_PANEL_COLOR = "notification_panel_color";
 
         /**
+         * @hide
+         */
+        public static final String NAVIGATION_BAR_COLOR = "navigation_bar_color";
+
+        /**
          * The color tint of the navigation buttons in the tablet combined bar.
          * default: none
          * @hide

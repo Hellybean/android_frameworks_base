@@ -411,6 +411,12 @@ public abstract class BaseStatusBar extends SystemUI implements
         statusbarView.getBackground().setAlpha(Math.round((opacity * 255) / 100));
     }
 
+    protected void setNotificationPanelParams(View notificationpanel){
+        int opacity = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.NOTIFICATION_PANEL_TRANSPARENCY, 100);
+        notificationpanel.setBackgroundColor((int) (((float) opacity / 100.0f) * 255) * 0x1000000);
+    }
+
     protected void updateRecentsPanel(int recentsResId) {
         // Recents Panel
         boolean visible = false;

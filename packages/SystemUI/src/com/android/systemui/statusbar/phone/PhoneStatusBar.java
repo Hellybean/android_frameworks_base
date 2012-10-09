@@ -306,6 +306,8 @@ public class PhoneStatusBar extends BaseStatusBar {
                     Settings.System.HIGH_END_GFX_ENABLED), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_TRANSPARENCY), false, this);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.NOTIFICATION_PANEL_TRANSPARENCY), false, this);
             update();
         }
 
@@ -324,6 +326,8 @@ public class PhoneStatusBar extends BaseStatusBar {
             mHighEndGfx = Settings.System.getInt(resolver,
                     Settings.System.HIGH_END_GFX_ENABLED, 0) != 0;
             setStatusBarParams(mStatusBarView);
+            setNotificationPanelParams(mNotificationPanel);
+//	    setNotificationPanelParams(mNavigationBarView);
         }
     }
 
@@ -479,6 +483,8 @@ public class PhoneStatusBar extends BaseStatusBar {
         } else {
             mNotificationPanel.setBackgroundColor(color);
         }
+
+	setNotificationPanelParams(mNotificationPanel);
 
         if (ENABLE_INTRUDERS) {
             mIntruderAlertView = (IntruderAlertView) View.inflate(context, R.layout.intruder_alert, null);
@@ -2706,6 +2712,8 @@ public class PhoneStatusBar extends BaseStatusBar {
             mCurrentTheme = (CustomTheme)newTheme.clone();
             recreateStatusBar();
             setStatusBarParams(mStatusBarView);
+            setNotificationPanelParams(mNotificationPanel);
+//	    setNotificationPanelParams(mNavigationBarView);
         } else {
 
             if (mClearButton instanceof TextView) {

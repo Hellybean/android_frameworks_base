@@ -2560,6 +2560,14 @@ public final class Settings {
          */
         public static final String STATUS_BAR_TRANSPARENCY = "status_bar_transparency";
 
+
+        /**
+         * Notification Panel transparency value
+         * from 0% to 100%
+         * @hide
+         */
+        public static final String NOTIFICATION_PANEL_TRANSPARENCY = "notification_panel_transparency";
+
         /**
          * Display style of the status bar battery information
          * 0: Display the stock battery information

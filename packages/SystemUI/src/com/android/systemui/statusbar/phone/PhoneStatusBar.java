@@ -472,16 +472,18 @@ public class PhoneStatusBar extends BaseStatusBar {
                   View.STATUS_BAR_DISABLE_NOTIFICATION_TICKER
                 | (mNotificationPanelIsFullScreenWidth ? 0 : View.STATUS_BAR_DISABLE_SYSTEM_INFO));
 
-        int color = Settings.System.getInt(context.getContentResolver(),
-                Settings.System.NOTIFICATION_PANEL_COLOR, 0xFF000000);
-        color = Color.rgb(Color.red(color), Color.green(color), Color.blue(color));
+//        int color = Settings.System.getInt(context.getContentResolver(),
+//                Settings.System.NOTIFICATION_PANEL_COLOR, 0xFF000000);
+//        color = Color.rgb(Color.red(color), Color.green(color), Color.blue(color));
 
         if (!ActivityManager.isHighEndGfx(mDisplay) && !mHighEndGfx) {
 
             mStatusBarWindow.setBackground(null);
-            mNotificationPanel.setBackground(new FastColorDrawable(color));
-        } else {
-            mNotificationPanel.setBackgroundColor(color);
+            mNotificationPanel.setBackground(new FastColorDrawable(context.getResources().getColor(
+                    R.color.notification_panel_solid_background)));
+//            mNotificationPanel.setBackground(new FastColorDrawable(color));
+//        } else {
+//            mNotificationPanel.setBackgroundColor(color);
         }
 
 	setNotificationPanelParams(mNotificationPanel);

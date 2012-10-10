@@ -2392,7 +2392,7 @@ public final class Settings {
         /**
          * @hide
          */
-        public static final String NOTIFICATION_PANEL_COLOR = "notification_panel_color";
+//        public static final String NOTIFICATION_PANEL_COLOR = "notification_panel_color";
 
         /**
          * @hide

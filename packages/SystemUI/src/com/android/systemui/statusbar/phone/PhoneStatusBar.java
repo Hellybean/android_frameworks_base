@@ -111,6 +111,9 @@ import com.android.systemui.statusbar.policy.OnSizeChangedListener;
 import com.android.systemui.statusbar.policy.NetworkController;
 import com.android.systemui.statusbar.policy.NotificationRowLayout;
 
+import com.android.systemui.statusbar.policy.ToggleSlider;
+import com.android.systemui.statusbar.policy.VolumeController;
+
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -285,6 +288,8 @@ public class PhoneStatusBar extends BaseStatusBar {
     // for disabling the status bar
     int mDisabled = 0;
 
+    VolumeController mVolume;
+
     // tracking calls to View.setSystemUiVisibility()
     int mSystemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE;
 
@@ -320,6 +325,8 @@ public class PhoneStatusBar extends BaseStatusBar {
                     Settings.System.NOTIFICATION_PANEL_TRANSPARENCY), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.SENSE4_RECENT_APPS), false, this);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.PHONE_STATUS_BAR_VOLUME), false, this);
             update();
         }
 
@@ -342,6 +349,9 @@ public class PhoneStatusBar extends BaseStatusBar {
             useSenseView = (Settings.System.getInt(resolver,
                     Settings.System.SENSE4_RECENT_APPS, 0) == 1);
             setStatusBarParams(mStatusBarView);
+            mSettingsButton.setVisibility(Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.ACTIVE_USER_ID, 0) != 0 ? View.GONE : View.VISIBLE);
+            refreshStatusBarVolume();
             setNotificationPanelParams(mNotificationPanel);
 //	    setNotificationPanelParams(mNavigationBarView);
 	    updateRecentsPanel();
@@ -699,9 +709,20 @@ public class PhoneStatusBar extends BaseStatusBar {
 
         mPowerWidget.setupWidget();
 
+        refreshStatusBarVolume();
+
         mVelocityTracker = VelocityTracker.obtain();
 
         return mStatusBarView;
+    }
+
+    private void refreshStatusBarVolume() {
+        boolean show = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.PHONE_STATUS_BAR_VOLUME, 0) == 1;
+        View volumeLayout = mStatusBarWindow.findViewById(R.id.volume_layout);
+        volumeLayout.setVisibility(show ? View.VISIBLE : View.GONE);
+        ToggleSlider volume = (ToggleSlider) mStatusBarWindow.findViewById(R.id.volume);
+        if (mVolume == null && show) mVolume = new VolumeController(mContext, volume);
     }
 
     @Override

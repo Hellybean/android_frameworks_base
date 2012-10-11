@@ -820,7 +820,6 @@ public class PhoneStatusBar extends BaseStatusBar {
 
         int color = Settings.System.getInt(mContext.getContentResolver(),
                 Settings.System.NAVIGATION_BAR_COLOR, 0xFF000000);
-        color = Color.rgb(Color.red(color), Color.green(color), Color.blue(color));
         mNavigationBarView.setBackgroundColor(color);
     }
 

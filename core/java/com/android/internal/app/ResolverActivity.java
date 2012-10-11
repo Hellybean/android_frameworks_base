@@ -22,6 +22,7 @@ import com.android.internal.content.PackageMonitor;
 import android.app.ActivityManager;
 import android.app.ActivityManagerNative;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -31,6 +32,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
+import android.database.ContentObserver;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -38,6 +40,7 @@ import android.os.PatternMatcher;
 import android.os.Process;
 import android.os.RemoteException;
 import android.os.UserId;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,6 +48,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -73,11 +77,15 @@ public class ResolverActivity extends AlertActivity implements AdapterView.OnIte
     private GridView mGrid;
     private Button mAlwaysButton;
     private Button mOnceButton;
+    private CheckBox mAlwaysCheckBox;
     private int mIconDpi;
     private int mIconSize;
     private int mMaxColumns;
-
+    private boolean mUseAltGrid;
     private boolean mRegistered;
+
+    private Context mContext;
+
     private final PackageMonitor mPackageMonitor = new PackageMonitor() {
         @Override public void onSomePackagesChanged() {
             mAdapter.handlePackagesChanged();
@@ -113,6 +121,10 @@ public class ResolverActivity extends AlertActivity implements AdapterView.OnIte
         } catch (RemoteException e) {
             mLaunchedFromUid = -1;
         }
+	ContentResolver resolver = mContext.getContentResolver();
+        mUseAltGrid = Settings.System.getInt(mContext.getContentResolver(),
+ 		Settings.System.ACTIVITY_RESOLVER_USE_ALT, 0) == 1;
+	
         mPm = getPackageManager();
         mAlwaysUseOption = alwaysUseOption;
         mMaxColumns = getResources().getInteger(R.integer.config_maxResolverActivityColumns);
@@ -137,7 +149,11 @@ public class ResolverActivity extends AlertActivity implements AdapterView.OnIte
             finish();
             return;
         } else if (count > 1) {
-            ap.mView = getLayoutInflater().inflate(R.layout.resolver_grid, null);
+            if (mUseAltGrid) {
+                ap.mView = getLayoutInflater().inflate(R.layout.resolver_grid_alt, null);
+            } else {
+                ap.mView = getLayoutInflater().inflate(R.layout.resolver_grid, null);
+            }
             mGrid = (GridView) ap.mView.findViewById(R.id.resolver_grid);
             mGrid.setAdapter(mAdapter);
             mGrid.setOnItemClickListener(this);
@@ -164,8 +180,12 @@ public class ResolverActivity extends AlertActivity implements AdapterView.OnIte
             final ViewGroup buttonLayout = (ViewGroup) findViewById(R.id.button_bar);
             if (buttonLayout != null) {
                 buttonLayout.setVisibility(View.VISIBLE);
-                mAlwaysButton = (Button) buttonLayout.findViewById(R.id.button_always);
-                mOnceButton = (Button) buttonLayout.findViewById(R.id.button_once);
+                if (mUseAltGrid) {
+                    mAlwaysCheckBox = (CheckBox) buttonLayout.findViewById(R.id.checkbox_always);
+                } else {
+                    mAlwaysButton = (Button) buttonLayout.findViewById(R.id.button_always);
+                    mOnceButton = (Button) buttonLayout.findViewById(R.id.button_once);
+                }
             } else {
                 mAlwaysUseOption = false;
             }
@@ -247,8 +267,10 @@ public class ResolverActivity extends AlertActivity implements AdapterView.OnIte
         if (mAlwaysUseOption) {
             final int checkedPos = mGrid.getCheckedItemPosition();
             final boolean enabled = checkedPos != GridView.INVALID_POSITION;
-            mAlwaysButton.setEnabled(enabled);
-            mOnceButton.setEnabled(enabled);
+            if (!mUseAltGrid) {
+                mAlwaysButton.setEnabled(enabled);
+                mOnceButton.setEnabled(enabled);
+            }
             if (enabled) {
                 mGrid.setSelection(checkedPos);
             }
@@ -260,10 +282,16 @@ public class ResolverActivity extends AlertActivity implements AdapterView.OnIte
         if (mAlwaysUseOption) {
             final int checkedPos = mGrid.getCheckedItemPosition();
             final boolean enabled = checkedPos != GridView.INVALID_POSITION;
-            mAlwaysButton.setEnabled(enabled);
-            mOnceButton.setEnabled(enabled);
+            if (!mUseAltGrid) {
+                mAlwaysButton.setEnabled(enabled);
+                mOnceButton.setEnabled(enabled);
+            } 
             if (enabled) {
-                mGrid.smoothScrollToPosition(checkedPos);
+                if (mUseAltGrid) {
+                    startSelected(position,mAlwaysCheckBox.isChecked());
+                } else {
+                    mGrid.smoothScrollToPosition(checkedPos);
+                }
             }
         } else {
             startSelected(position, false);

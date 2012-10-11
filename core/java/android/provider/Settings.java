@@ -3316,6 +3316,15 @@ public final class Settings {
          * @hide
          */
         public static final String RECENT_TASK_MANAGER_BUTTON = "recent_task_manager_button";
+        
+        /**
+         * use Alt Activity Resolver Grid (GB style)
+         * boolean
+         *
+         * @hide
+         */
+        public static final String ACTIVITY_RESOLVER_USE_ALT = "activity_resolver_use_alt";
+
     }
 
     /**

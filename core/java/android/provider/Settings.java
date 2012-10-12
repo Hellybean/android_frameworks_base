@@ -2430,46 +2430,47 @@ public final class Settings {
         public static final String EDGE_SWIPE_BLACKLIST = "edge_swipe_blacklist";
 
         /**
-         * Show toggles on statusbar
+         * Use the Notification Power Widget? (Who wouldn't!)
+         *
          * @hide
          */
-        public static final String STATUSBAR_TOGGLES_USE_BUTTONS = "statusbar_toggles_use_buttons";
+        public static final String EXPANDED_VIEW_WIDGET = "expanded_view_widget";
 
         /**
-         * Whether to show or not statusbar brightness slider
+         * Whether to hide the notification screen after clicking on a widget
+         * button
+         *
          * @hide
          */
-        public static final String STATUS_BAR_BRIGHTNESS_SLIDER = "statusbar_brightness_slider";
+        public static final String EXPANDED_HIDE_ONCHANGE = "expanded_hide_onchange";
 
         /**
-         * Toggles to use on statusbar
+         * Hide scroll bar in power widget
+         *
          * @hide
          */
-        public static final String STATUSBAR_TOGGLES = "statusbar_toggles";
+        public static final String EXPANDED_HIDE_SCROLLBAR = "expanded_hide_scrollbar";
 
         /**
-         * Style of the toggles
+         * Haptic feedback in power widget
+         *
          * @hide
          */
-        public static final String STATUSBAR_TOGGLES_STYLE = "statusbar_toggles_style";
+        public static final String EXPANDED_HAPTIC_FEEDBACK = "expanded_haptic_feedback";
 
         /**
-         * Whether to show brightness on toggles view
+         * Widget Buttons to Use
+         *
          * @hide
          */
-        public static final String STATUSBAR_TOGGLES_SHOW_BRIGHTNESS = "statusbar_toggles_show_brightness";
+        public static final String WIDGET_BUTTONS = "expanded_widget_buttons";
 
         /**
-         * Toggles per row
+         * Widget Buttons to Use - Tablet
+         *
          * @hide
          */
-        public static final String STATUSBAR_TOGGLES_NUMBER_PER_ROW = "statusbar_toggles_number_per_row";
-
-        /**
-         * Statusbar layout
-         * @hide
-         */
-        public static final String STATUS_BAR_LAYOUT = "statusbar_layout";
+        public static final String WIDGET_BUTTONS_TABLET = "expanded_widget_buttons_tablet";
 
         /**
          * Navigation controls to Use

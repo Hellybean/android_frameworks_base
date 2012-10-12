@@ -2430,16 +2430,16 @@ public final class Settings {
         public static final String EDGE_SWIPE_BLACKLIST = "edge_swipe_blacklist";
 
         /**
-         * Enable toggles on statusbar
-         * @hide
-         */
-        public static final String STATUSBAR_TOGGLES_ENABLE = "statusbar_toggles_enable";
-
-        /**
-         * Button-like toggles style (instead of switches)
+         * Show toggles on statusbar
          * @hide
          */
         public static final String STATUSBAR_TOGGLES_USE_BUTTONS = "statusbar_toggles_use_buttons";
+
+        /**
+         * Whether to show or not statusbar brightness slider
+         * @hide
+         */
+        public static final String STATUS_BAR_BRIGHTNESS_SLIDER = "statusbar_brightness_slider";
 
         /**
          * Toggles to use on statusbar
@@ -2458,6 +2458,12 @@ public final class Settings {
          * @hide
          */
         public static final String STATUSBAR_TOGGLES_SHOW_BRIGHTNESS = "statusbar_toggles_show_brightness";
+
+        /**
+         * Toggles per row
+         * @hide
+         */
+        public static final String STATUSBAR_TOGGLES_NUMBER_PER_ROW = "statusbar_toggles_number_per_row";
 
         /**
          * Statusbar layout

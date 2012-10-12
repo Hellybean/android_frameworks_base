@@ -49,7 +49,8 @@
 
         <include layout="@layout/status_bar_expanded_header"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/notification_panel_header_height"/>
+            android:layout_height="@dimen/notification_panel_header_height"
+            />
 
         <TextView
             android:id="@+id/emergency_calls_only"
@@ -66,18 +67,19 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fadingEdge="none"
-            android:overScrollMode="always"
-            android:layout_marginTop="@dimen/notification_panel_widget_padding_top">
-
+            android:overScrollMode="ifContentScrolls"
+            android:layout_marginTop="@dimen/notification_panel_widget_padding_top"
+            >
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical" >
-                <include layout="@layout/quick_toggles"
+                <include
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="5dp"
-                    android:layout_marginLeft="5dp" />
+                    android:layout_marginLeft="5dp"
+                    layout="@layout/quick_toggles" />
                 <com.android.systemui.statusbar.policy.NotificationRowLayout
                     android:id="@+id/latestItems"
                     android:layout_width="match_parent"

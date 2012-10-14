@@ -52,6 +52,7 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.database.ContentObserver;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
@@ -1839,6 +1840,8 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
         private long mGestureThreeTime;
         private long mGestureFourTime;
 
+        private boolean mShowGestures = false;
+
         private StatusBarManager mSbm;
 
         private ActivityManager mActivityManager;
@@ -1907,6 +1910,8 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
                     Settings.System.GESTURE_SWIPE_CAPTURE), false, this);
                 getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
                     Settings.System.GESTURE_SWIPE_DISTANCE), false, this);
+                getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.SHOW_GESTURES), false, this);
             }
 
             public void unobserve() {
@@ -1942,7 +1947,7 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
             mGestureCapture = Settings.System.getInt(resolver,
                     Settings.System.GESTURE_SWIPE_CAPTURE, 0) == 1;
             mGestureDistance = Settings.System.getInt(resolver,
-                    Settings.System.GESTURE_SWIPE_CAPTURE, 0);
+                    Settings.System.GESTURE_SWIPE_DISTANCE, 0);
 
             mBlacklist = Settings.System.getString(resolver,
                     Settings.System.EDGE_SWIPE_BLACKLIST);
@@ -1970,6 +1975,11 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
                 mZoneThree[i] = Float.parseFloat(zoneThree[i]) / 100f;
                 mZoneFour[i] = Float.parseFloat(zoneFour[i]) / 100f;
             }
+
+            mShowGestures = Settings.System.getInt(resolver,
+                    Settings.System.SHOW_GESTURES, 0) == 1;
+
+            invalidate();
         }
 
         @Override
@@ -2168,7 +2178,8 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
         public boolean onInterceptTouchEvent(MotionEvent event) {
             int action = event.getAction();
 
-            if (!mBlacklisted && mGestureOne + mGestureTwo + mGestureThree + mGestureFour > 0) {
+            if (mFeatureId == -1 &&!mBlacklisted &&
+                    mGestureOne + mGestureTwo + mGestureThree + mGestureFour > 0) {
                 float x = event.getX();
                 float y = event.getY();
                 float width = (float) getWidth();
@@ -2545,6 +2556,54 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
             if (mMenuBackground != null) {
                 mMenuBackground.draw(canvas);
             }
+
+            if (mFeatureId == -1 && mShowGestures) {
+                Paint paint = new Paint();
+                paint.setColor(0x80F3F3F3);
+                paint.setStrokeWidth(0);
+
+                float width = (float) getWidth();
+                float height = (float) getHeight();
+
+                if (mGestureOne > 0) {
+                    canvas.drawRect(mZoneOne[0] * width,
+                            mZoneOne[2] * height,
+                            mZoneOne[1] * width,
+                            mZoneOne[3] * height,
+                            paint);
+                }
+
+                paint.setColor(0x80FF0033);
+
+                if (mGestureTwo > 0) {
+                    canvas.drawRect(mZoneTwo[0] * width,
+                            mZoneTwo[2] * height,
+                            mZoneTwo[1] * width,
+                            mZoneTwo[3] * height,
+                            paint);
+                }
+
+                paint.setColor(0x80006600);
+
+                if (mGestureThree > 0) {
+                    canvas.drawRect(mZoneThree[0] * width,
+                            mZoneThree[2] * height,
+                            mZoneThree[1] * width,
+                            mZoneOne[3] * height,
+                            paint);
+                }
+
+                paint.setColor(0x803366FF);
+
+                if (mGestureFour > 0) {
+                    canvas.drawRect(mZoneFour[0] * width,
+                            mZoneFour[2] * height,
+                            mZoneFour[1] * width,
+                            mZoneFour[3] * height,
+                            paint);
+                }
+            }
+
         }
 
 

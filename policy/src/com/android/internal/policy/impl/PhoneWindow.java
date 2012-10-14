@@ -2586,7 +2586,7 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
                     canvas.drawRect(mZoneThree[0] * width,
                             mZoneThree[2] * height,
                             mZoneThree[1] * width,
-                            mZoneOne[3] * height,
+                            mZoneThree[3] * height,
                             paint);
                 }
 

@@ -517,6 +517,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     boolean mSearchKeyShortcutPending;
     boolean mConsumeSearchKeyUp;
     boolean mAssistKeyLongPressed;
+    boolean mFullscreenMode;
 
     // Used when key is pressed and performing non-default action
     boolean mMenuDoCustomAction;
@@ -638,6 +639,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
         void observe() {
             ContentResolver resolver = mContext.getContentResolver();
+	
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.FULLSCREEN_MODE), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NAVIGATION_CONTROLS), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
@@ -1556,6 +1560,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         } else {
             mHasNavigationBar = false;
         }        
+        mFullscreenMode = Settings.System.getInt(resolver,
+                Settings.System.FULLSCREEN_MODE, 0) == 1;
     }
 
     private void enablePointerLocation() {
@@ -1806,7 +1812,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     }
 
     public int getNonDecorDisplayWidth(int fullWidth, int fullHeight, int rotation) {
-        if (mHasNavigationBar) {
+        if (mHasNavigationBar && !mFullscreenMode) {
             // For a basic navigation bar, when we are in landscape mode we place
             // the navigation bar to the side.
             if (mNavigationBarCanMove && fullWidth > fullHeight) {
@@ -1817,11 +1823,11 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     }
 
     public int getNonDecorDisplayHeight(int fullWidth, int fullHeight, int rotation) {
-        if (mHasSystemNavBar) {
+        if (mHasSystemNavBar && !mFullscreenMode) {
             // For the system navigation bar, we always place it at the bottom.
             return fullHeight - mNavigationBarHeightForRotation[rotation];
         }
-        if (mHasNavigationBar) {
+        if (mHasNavigationBar && !mFullscreenMode) {
             // For a basic navigation bar, when we are in portrait mode we place
             // the navigation bar to the bottom.
             if (!mNavigationBarCanMove || fullWidth < fullHeight) {
@@ -1841,7 +1847,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         // fixed decor, since it can hide; however, for purposes of configurations,
         // we do want to exclude it since applications can't generally use that part
         // of the screen.
-        if (!mHasSystemNavBar) {
+        if (!mHasSystemNavBar && !mFullscreenMode) {
             return getNonDecorDisplayHeight(fullWidth, fullHeight, rotation) - mStatusBarHeight;
         }
         return getNonDecorDisplayHeight(fullWidth, fullHeight, rotation);
@@ -2856,7 +2862,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                 mHideNavFakeWindow.dismiss();
                 mHideNavFakeWindow = null;
             }
-        } else if (mHideNavFakeWindow == null) {
+        } else if (mHideNavFakeWindow == null && !mFullscreenMode) {
             mHideNavFakeWindow = mWindowManagerFuncs.addFakeWindow(
                     mHandler.getLooper(), mHideNavInputEventReceiverFactory,
                     "hidden nav", WindowManager.LayoutParams.TYPE_HIDDEN_NAV_CONSUMER,

@@ -2427,6 +2427,16 @@ public final class Settings {
         /**
          * @hide
          */
+        public static final String FULLSCREEN_MODE = "fullscreen_mode";
+
+        /**
+         * @hide
+         */
+        public static final String FULLSCREEN_TIMEOUT = "fullscreen_timeout";
+
+        /**
+         * @hide
+         */
         public static final String EDGE_SWIPE_BLACKLIST = "edge_swipe_blacklist";
 
         /**

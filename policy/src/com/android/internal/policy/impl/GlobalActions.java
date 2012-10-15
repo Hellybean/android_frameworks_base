@@ -404,8 +404,10 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
         }
 
         // Next NavBar Hide
-        if (Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.POWER_MENU_NAV_CONTROLS_ENABLED, 0) == 1) {
+        if ((Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.POWER_MENU_NAV_CONTROLS_ENABLED, 0) == 1) ||
+                (Settings.System.getInt(mContext.getContentResolver(),
+                    Settings.System.FULLSCREEN_MODE, 0) == 1)) {
             mItems.add(mNavBarHideToggle);
         }
 

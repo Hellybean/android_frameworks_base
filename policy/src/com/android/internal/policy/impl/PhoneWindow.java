@@ -2298,10 +2298,7 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
                     mGestureThreeStarted = false;
                     mGestureFourStarted = false;
 
-                    if (((handledOne || handledTwo || handledThree || handledFour)
-                            && mGestureCapture) || (mGestureTypeOne == 2 && handledOne)
-                            || (mGestureTypeTwo == 2 && handledTwo) || (mGestureTypeThree == 2
-                            && handledThree) || (mGestureTypeFour == 2 || handledFour)) {
+                    if (handledOne || handledTwo || handledThree || handledFour) {
                         return true;
                     }
                 } else if (action == MotionEvent.ACTION_MOVE) {

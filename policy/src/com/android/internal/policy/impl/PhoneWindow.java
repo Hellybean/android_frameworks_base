@@ -43,6 +43,7 @@ import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.KeyguardManager;
 import android.app.StatusBarManager;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -1805,21 +1806,49 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
         private PopupWindow mActionModePopup;
         private Runnable mShowActionModePopup;
 
-        private boolean mSwipeRight = false;
-        private boolean mSwipeLeft = false;
-        private boolean mSwipeBottom = false;
-        private boolean mSwipeTop = false;
-        private int mSwipeStartRight;
-        private int mSwipeStartLeft;
-        private int mSwipeStartBottom;
-        private int mSwipeStartTop;
+        private SettingsObserver mSettingsObserver;
+
+        private int mGestureOne;
+        private int mGestureTwo;
+        private int mGestureThree;
+        private int mGestureFour;
+
+        private int mGestureTypeOne;
+        private int mGestureTypeTwo;
+        private int mGestureTypeThree;
+        private int mGestureTypeFour;
+
+        private boolean mGestureCapture;
+        private int mGestureDistance;
+
+        private String mBlacklist;
+        private boolean mBlacklisted;
+
+        private float mZoneOne[];
+        private float mZoneTwo[];
+        private float mZoneThree[];
+        private float mZoneFour[];
+
+        private boolean mGestureOneStarted = false;
+        private boolean mGestureTwoStarted = false;
+        private boolean mGestureThreeStarted = false;
+        private boolean mGestureFourStarted = false;
+
+        private long mGestureOneTime;
+        private long mGestureTwoTime;
+        private long mGestureThreeTime;
+        private long mGestureFourTime;
+
         private StatusBarManager mSbm;
-        private int mLastSystemUiVis = 0;
+
+        private ActivityManager mActivityManager;
 
         public DecorView(Context context, int featureId) {
             super(context);
             mFeatureId = featureId;
-            updateGestureSettings();
+
+            mSettingsObserver = new SettingsObserver();
+
             if (mFullscreenMode) {
                 final int flags = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                         | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
@@ -1828,24 +1857,118 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
                         | View.SYSTEM_UI_FLAG_FULLSCREEN
                         | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION;
                 setSystemUiVisibility(flags);
+            }
 
-                setOnSystemUiVisibilityChangeListener(
-                        new View.OnSystemUiVisibilityChangeListener() {
-                    @Override
-                    public void onSystemUiVisibilityChange(int visibility) {
-                        int diff = mLastSystemUiVis ^ visibility;
-                        mLastSystemUiVis = visibility;
-                        if ((diff & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) != 0
-                                && (visibility & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) == 0) {
-                            postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    setSystemUiVisibility(flags);
-                                }
-                            }, mStatusBarTimeout);
-                        }
-                    }
-                });
+            mActivityManager =
+                    (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+
+            mZoneOne = new float[4];
+            mZoneTwo = new float[4];
+            mZoneThree = new float[4];
+            mZoneFour = new float[4];
+
+            updateGestureSettings();
+        }
+
+        private class SettingsObserver extends ContentObserver {
+
+            SettingsObserver() {
+                super(new Handler());
+            }
+
+            public void observe() {
+                getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.GESTURE_ONE), false, this);
+                getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.GESTURE_TWO), false, this);
+                getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.GESTURE_THREE), false, this);
+                getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.GESTURE_FOUR), false, this);
+                getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.GESTURE_TYPE_ONE), false, this);
+                getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.GESTURE_TYPE_TWO), false, this);
+                getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.GESTURE_TYPE_THREE), false, this);
+                getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.GESTURE_TYPE_FOUR), false, this);
+                getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.TOUCH_ZONE_ONE), false, this);
+                getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.TOUCH_ZONE_TWO), false, this);
+                getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.TOUCH_ZONE_THREE), false, this);
+                getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.TOUCH_ZONE_FOUR), false, this);
+                getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.FULLSCREEN_MODE), false, this);
+                getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.GESTURE_SWIPE_CAPTURE), false, this);
+                getContext().getContentResolver().registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.GESTURE_SWIPE_DISTANCE), false, this);
+            }
+
+            public void unobserve() {
+                getContext().getContentResolver().unregisterContentObserver(this);
+            }
+
+            @Override
+            public void onChange(boolean selfChange) {
+                super.onChange(selfChange);
+                updateGestureSettings();
+            }
+        }
+
+        void updateGestureSettings() {
+            ContentResolver resolver = getContext().getContentResolver();
+
+            mGestureOne = Settings.System.getInt(resolver,
+                    Settings.System.GESTURE_ONE, 0);
+            mGestureTwo = Settings.System.getInt(resolver,
+                    Settings.System.GESTURE_TWO, 0);
+            mGestureThree = Settings.System.getInt(resolver,
+                    Settings.System.GESTURE_THREE, 0);
+            mGestureFour = Settings.System.getInt(resolver,
+                    Settings.System.GESTURE_FOUR, 0);
+            mGestureTypeOne = Settings.System.getInt(resolver,
+                    Settings.System.GESTURE_TYPE_ONE, 0);
+            mGestureTypeTwo = Settings.System.getInt(resolver,
+                    Settings.System.GESTURE_TYPE_TWO, 0);
+            mGestureTypeThree = Settings.System.getInt(resolver,
+                    Settings.System.GESTURE_TYPE_THREE, 0);
+            mGestureTypeFour = Settings.System.getInt(resolver,
+                    Settings.System.GESTURE_TYPE_FOUR, 0);
+            mGestureCapture = Settings.System.getInt(resolver,
+                    Settings.System.GESTURE_SWIPE_CAPTURE, 0) == 1;
+            mGestureDistance = Settings.System.getInt(resolver,
+                    Settings.System.GESTURE_SWIPE_CAPTURE, 0);
+
+            mBlacklist = Settings.System.getString(resolver,
+                    Settings.System.EDGE_SWIPE_BLACKLIST);
+
+            String one = Settings.System.getString(resolver,
+                    Settings.System.TOUCH_ZONE_ONE);
+            if (one == null) one = "0|6|0|100";
+            String two = Settings.System.getString(resolver,
+                    Settings.System.TOUCH_ZONE_TWO);
+            if (two == null) two = "0|100|0|6";
+            String three = Settings.System.getString(resolver,
+                    Settings.System.TOUCH_ZONE_THREE);
+            if (three == null) three = "94|100|0|100";
+            String four = Settings.System.getString(resolver,
+                    Settings.System.TOUCH_ZONE_FOUR);
+            if (four == null) four = "0|100|94|100";
+
+            String zoneOne[] = one.split("\\|");
+            String zoneTwo[] = two.split("\\|");
+            String zoneThree[] = three.split("\\|");
+            String zoneFour[] = four.split("\\|");
+            for (int i = 0; i < 4; i++) {
+                mZoneOne[i] = Float.parseFloat(zoneOne[i]) / 100f;
+                mZoneTwo[i] = Float.parseFloat(zoneTwo[i]) / 100f;
+                mZoneThree[i] = Float.parseFloat(zoneThree[i]) / 100f;
+                mZoneFour[i] = Float.parseFloat(zoneFour[i]) / 100f;
             }
         }
 
@@ -2043,76 +2166,142 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
 
         @Override
         public boolean onInterceptTouchEvent(MotionEvent event) {
-            boolean blacklisted = false;
-
-            if (mBlacklist != null) {
-                ActivityManager activityManager =
-                        (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
-                List<RunningAppProcessInfo> appProcesses = activityManager.getRunningAppProcesses();
-                for (RunningAppProcessInfo appProcess : appProcesses) {
-                    if (appProcess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
-                        if (mBlacklist.contains(appProcess.processName)) blacklisted = true;
-                    }
-                }
-            }
-
             int action = event.getAction();
 
-            int topOffset = 0;
-            if (!mTabletMode || mContext.getResources().getConfiguration()
-                    .smallestScreenWidthDp < 600) {
-                 topOffset = mContext.getResources().getDimensionPixelSize(
-                        com.android.internal.R.dimen.status_bar_height);
-            }
-
-            int bottomOffset = 0;
-            if (!mTabletMode && mHasNavigationBar) {
-                 bottomOffset = mContext.getResources().getDimensionPixelSize(
-                        com.android.internal.R.dimen.navigation_bar_height);
-            }
-
-            if (!blacklisted && mGestureBottom + mGestureLeft + mGestureRight + mGestureTop > 0) {
-                int x = (int)event.getX();
-                int y = (int)event.getY();
-                boolean handled = false;
+            if (!mBlacklisted && mGestureOne + mGestureTwo + mGestureThree + mGestureFour > 0) {
+                float x = event.getX();
+                float y = event.getY();
+                float width = (float) getWidth();
+                float height = (float) getHeight();
                 if (action == MotionEvent.ACTION_DOWN) {
-                    if (mGestureBottom > 0 && y > getHeight() - mGestureStart - bottomOffset) {
-                        mSwipeBottom = true;
-                        mSwipeStartBottom = y;
-                    } else if (mGestureTop > 0 && y < mGestureStart + topOffset) {
-                        mSwipeTop = true;
-                        mSwipeStartTop = y;
-                    } else if (mGestureRight > 0 && x > getWidth() - mGestureStart) {
-                        mSwipeRight = true;
-                        mSwipeStartRight = x;
-                    } else if (mGestureLeft > 0 && x < mGestureStart) {
-                        mSwipeLeft = true;
-                        mSwipeStartLeft = x;
+                    if (mGestureOne > 0
+                            && x > (mZoneOne[0] * width)
+                            && x < (mZoneOne[1] * width)
+                            && y > (mZoneOne[2] * height)
+                            && y < (mZoneOne[3] * height)) {
+                        mGestureOneTime = event.getEventTime();
+                        mGestureOneStarted = true;
+                        mGestureTwoStarted = false;
+                        mGestureThreeStarted = false;
+                        mGestureFourStarted = false;
+                    } else if (mGestureTwo > 0
+                            && x > (mZoneTwo[0] * width)
+                            && x < (mZoneTwo[1] * width)
+                            && y > (mZoneTwo[2] * height)
+                            && y < (mZoneTwo[3] * height)) {
+                        mGestureTwoTime = event.getEventTime();
+                        mGestureTwoStarted = true;
+                        mGestureOneStarted = false;
+                        mGestureThreeStarted = false;
+                        mGestureFourStarted = false;
+                    } else if (mGestureThree > 0
+                            && x > (mZoneThree[0] * width)
+                            && x < (mZoneThree[1] * width)
+                            && y > (mZoneThree[2] * height)
+                            && y < (mZoneThree[3] * height)) {
+                        mGestureThreeTime = event.getEventTime();
+                        mGestureThreeStarted = true;
+                        mGestureOneStarted = false;
+                        mGestureTwoStarted = false;
+                        mGestureFourStarted = false;
+                    } else if (mGestureFour > 0
+                            && x > (mZoneFour[0] * width)
+                            && x < (mZoneFour[1] * width)
+                            && y > (mZoneFour[2] * height)
+                            && y < (mZoneFour[3] * height)) {
+                        mGestureFourTime = event.getEventTime();
+                        mGestureFourStarted = true;
+                        mGestureOneStarted = false;
+                        mGestureTwoStarted = false;
+                        mGestureThreeStarted = false;
+                    } else {
+                        mGestureOneStarted = false;
+                        mGestureTwoStarted = false;
+                        mGestureThreeStarted = false;
+                        mGestureFourStarted = false;
                     }
                 } else if (action == MotionEvent.ACTION_UP) {
-                    if (mSwipeBottom && mSwipeStartBottom - y > mGestureDistance) {
-                        performGesture(mGestureBottom);
-                        handled = true;
-                    } else if (mSwipeTop && y > mGestureDistance + mSwipeStartTop) {
-                        performGesture(mGestureTop);
-                        handled = true;
-                    } else if (mSwipeRight && mSwipeStartRight - x > mGestureDistance) {
-                        performGesture(mGestureRight);
-                        handled = true;
-                    } else if (mSwipeLeft && x > mGestureDistance + mSwipeStartLeft) {
-                        performGesture(mGestureLeft);
-                        handled = true;
+                    boolean handledOne = false;
+                    boolean handledTwo = false;
+                    boolean handledThree = false;
+                    boolean handledFour = false;
+                    if (mGestureOneStarted) {
+                        if (mGestureTypeOne == 2
+                                && (x < ((mZoneOne[0] * width) - mGestureDistance)
+                                || x > ((mZoneOne[1] * width) + mGestureDistance)
+                                || y < ((mZoneOne[2] * height) - mGestureDistance)
+                                || y > ((mZoneOne[3] * height) + mGestureDistance))) {
+                            handledOne = true;
+                        } else if (mGestureTypeOne == 0) {
+                            handledOne = true;
+                        } else if (mGestureTypeOne == 1 && (event.getEventTime() - mGestureOneTime)
+                                > 500 && (event.getEventTime() - mGestureOneTime) < 1500) {
+                            handledOne = true;
+                        }
+                        if (handledOne) performGesture(mGestureOne);
+                    } else if (mGestureTwoStarted) {
+                        if (mGestureTypeTwo == 2
+                                && (x < ((mZoneTwo[0] * width) - mGestureDistance)
+                                || x > ((mZoneTwo[1] * width) + mGestureDistance)
+                                || y < ((mZoneTwo[2] * height) - mGestureDistance)
+                                || y > ((mZoneTwo[3] * height) + mGestureDistance))) {
+                            handledTwo = true;
+                        } else if (mGestureTypeTwo == 0) {
+                            handledTwo = true;
+                        } else if (mGestureTypeTwo == 1 && (event.getEventTime() - mGestureTwoTime)
+                                > 500 && (event.getEventTime() - mGestureTwoTime) < 1500) {
+                            handledTwo = true;
+                        }
+                        if (handledTwo) performGesture(mGestureTwo);
+                    } else if (mGestureThreeStarted) {
+                        if (mGestureTypeThree == 2
+                                && (x < ((mZoneThree[0] * width) - mGestureDistance)
+                                || x > ((mZoneThree[1] * width) + mGestureDistance)
+                                || y < ((mZoneThree[2] * height) - mGestureDistance)
+                                || y > ((mZoneThree[3] * height) + mGestureDistance))) {
+                            handledThree = true;
+                        } else if (mGestureTypeThree == 0) {
+                            handledThree = true;
+                        } else if (mGestureTypeThree == 1 && (event.getEventTime() - mGestureThreeTime)
+                                    > 500 && (event.getEventTime() - mGestureThreeTime) < 1500) {
+                            handledThree = true;
+                        }
+                        if (handledThree) performGesture(mGestureThree);
+                    } else if (mGestureFourStarted) {
+                        if (mGestureTypeFour == 2
+                                && (x < ((mZoneFour[0] * width) - mGestureDistance)
+                                || x > ((mZoneFour[1] * width) + mGestureDistance)
+                                || y < ((mZoneFour[2] * height) - mGestureDistance)
+                                || y > ((mZoneFour[3] * height) + mGestureDistance))) {
+                            handledFour = true;
+                        } else if (mGestureTypeFour == 0) {
+                            handledFour = true;
+                        } else if (mGestureTypeFour == 1 && (event.getEventTime() - mGestureFourTime)
+                                    > 500 && (event.getEventTime() - mGestureFourTime) < 1500) {
+                            handledFour = true;
+                        }
+                        if (handledFour) performGesture(mGestureFour);
                     }
-                    mSwipeRight = false;
-                    mSwipeLeft = false;
-                    mSwipeBottom = false;
-                    mSwipeTop = false;
-                    if (handled) {
+                    mGestureOneStarted = false;
+                    mGestureTwoStarted = false;
+                    mGestureThreeStarted = false;
+                    mGestureFourStarted = false;
+
+                    if (((handledOne || handledTwo || handledThree || handledFour)
+                            && mGestureCapture) || (mGestureTypeOne == 2 && handledOne)
+                            || (mGestureTypeTwo == 2 && handledTwo) || (mGestureTypeThree == 2
+                            && handledThree) || (mGestureTypeFour == 2 || handledFour)) {
                         return true;
                     }
-                } else if (action == MotionEvent.ACTION_MOVE && mGestureMove) {
-                    if (mSwipeRight || mSwipeLeft || mSwipeTop || mSwipeBottom) {
-                        return true;
+                } else if (action == MotionEvent.ACTION_MOVE) {
+                    if (mGestureOneStarted || mGestureTwoStarted ||
+                            mGestureThreeStarted || mGestureFourStarted) {
+                        if (mGestureCapture) return true;
+                    } else {
+                        mGestureOneStarted = false;
+                        mGestureTwoStarted = false;
+                        mGestureThreeStarted = false;
+                        mGestureFourStarted = false;
                     }
                 }
             }
@@ -2613,6 +2802,8 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
         @Override
         protected void onAttachedToWindow() {
             super.onAttachedToWindow();
+
+            mSettingsObserver.observe();
             
             updateWindowResizeState();
             
@@ -2631,11 +2822,22 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
                  */
                 openPanelsAfterRestore();
             }
+
+            if (mBlacklist != null) {
+                List<RunningAppProcessInfo> appProcesses = mActivityManager.getRunningAppProcesses();
+                for (RunningAppProcessInfo appProcess : appProcesses) {
+                    if (appProcess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+                        if (mBlacklist.contains(appProcess.processName)) mBlacklisted = true;
+                    }
+                }
+            }
         }
 
         @Override
         protected void onDetachedFromWindow() {
             super.onDetachedFromWindow();
+
+            mSettingsObserver.unobserve();
             
             final Callback cb = getCallback();
             if (cb != null && mFeatureId < 0) {
@@ -3805,34 +4007,5 @@ public class PhoneWindow extends Window implements MenuBuilder.Callback {
 
     void sendCloseSystemWindows(String reason) {
         PhoneWindowManager.sendCloseSystemWindows(getContext(), reason);
-    }
-
-    void updateGestureSettings() {
-        mGestureLeft = Settings.System.getInt(getContext().getContentResolver(),
-                Settings.System.EDGE_SWIPE_LEFT, 0);
-        mGestureTop = Settings.System.getInt(getContext().getContentResolver(),
-                Settings.System.EDGE_SWIPE_TOP, 0);
-        mGestureRight = Settings.System.getInt(getContext().getContentResolver(),
-                Settings.System.EDGE_SWIPE_RIGHT, 0);
-        mGestureBottom = Settings.System.getInt(getContext().getContentResolver(),
-                Settings.System.EDGE_SWIPE_BOTTOM, 0);
-        mGestureMove = Settings.System.getInt(getContext().getContentResolver(),
-                Settings.System.EDGE_SWIPE_MOVE, 0) == 1;
-        mGestureStart = Settings.System.getInt(getContext().getContentResolver(),
-                Settings.System.EDGE_SWIPE_START, 35);
-        mGestureDistance = Settings.System.getInt(getContext().getContentResolver(),
-                Settings.System.EDGE_SWIPE_DISTANCE, 40);
-        mDimDialogBackground = Settings.System.getInt(getContext().getContentResolver(),
-                Settings.System.DIM_DIALOG_BG, 0) == 1;
-        boolean hasNavigationBar = getContext().getResources().getBoolean(
-                com.android.internal.R.bool.config_showNavigationBar);
-        mHasNavigationBar = Settings.System.getInt(getContext().getContentResolver(),
-                Settings.System.NAVIGATION_CONTROLS, hasNavigationBar ? 1 : 0) == 1;
-        mFullscreenMode = Settings.System.getInt(getContext().getContentResolver(),
-                Settings.System.FULLSCREEN_MODE, 0) == 1;
-        mStatusBarTimeout = Settings.System.getInt(getContext().getContentResolver(),
-                Settings.System.FULLSCREEN_TIMEOUT, 2) * 1000;
-        mBlacklist = Settings.System.getString(getContext().getContentResolver(),
-                Settings.System.EDGE_SWIPE_BLACKLIST);
-    }
+    }  
 }

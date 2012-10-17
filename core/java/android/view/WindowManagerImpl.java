@@ -175,11 +175,6 @@ public class WindowManagerImpl implements WindowManager {
             return mWindowManager.isHardwareAccelerated();
         }
 
-        @Override
-        public boolean hasView(View view) {
-            return mWindowManager.hasView(view);
-        }
-
     }
 
     public static WindowManagerImpl getDefault() {
@@ -346,13 +341,6 @@ public class WindowManagerImpl implements WindowManager {
             ViewRootImpl root = mRoots[index];
             mParams[index] = wparams;
             root.setLayoutParams(wparams, false);
-        }
-    }
-
-    public boolean hasView(View view) {
-        synchronized (this) {
-            int index = findViewLocked(view, false);
-            return index > -1;
         }
     }
 

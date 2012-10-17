@@ -241,10 +241,6 @@ public class TabletStatusBar extends BaseStatusBar implements
     protected void createAndAddWindows() {
         addStatusBarWindow();
         addPanelWindows();
-        if (Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.STATUS_BAR_TOGGLED, 0) == 1) {
-            toggleVisibility();
-        }
     }
 
     private void addStatusBarWindow() {
@@ -1057,21 +1053,9 @@ public class TabletStatusBar extends BaseStatusBar implements
 
     public void toggleVisibility() {
         final WindowManager wm = WindowManagerImpl.getDefault();
-        if (mVisible && wm.hasView(mStatusBarView)) {
-            wm.removeView(mStatusBarView);
-            mRecentsPanel.setFullscreen(true);
-        } else {
-            addStatusBarWindow();
-            mRecentsPanel.setFullscreen(false);
-
-            // Search Panel
-            mStatusBarView.setBar(this);
-            mHomeButton.setOnTouchListener(mHomeSearchActionListener);
-            updateSearchPanel();
-        }
+        if (mVisible) wm.removeView(mStatusBarView);
+        else addStatusBarWindow();
         mVisible = !mVisible;
-        Settings.System.putInt(mContext.getContentResolver(),
-                Settings.System.STATUS_BAR_TOGGLED, mVisible ? 0 : 1);
     }
 
     public void disable(int state) {

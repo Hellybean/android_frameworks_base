@@ -64,14 +64,7 @@ public interface WindowManager extends ViewManager {
      * @param view The view to be removed.
      */
     public void removeViewImmediate(View view);
-
-    /**
-     * Checks if given view is attached
-     *
-     * @param view The view to be checked.
-     */
-    public boolean hasView(View view);
-
+    
     /**
      * Return true if this window manager is configured to request hardware
      * accelerated windows.  This does <em>not</em> guarantee that they will
@@ -79,7 +72,7 @@ public interface WindowManager extends ViewManager {
      * @hide
      */
     public boolean isHardwareAccelerated();
-
+    
     public static class LayoutParams extends ViewGroup.LayoutParams
             implements Parcelable {
         /**
@@ -89,7 +82,7 @@ public interface WindowManager extends ViewManager {
          */
         @ViewDebug.ExportedProperty
         public int x;
-
+        
         /**
          * Y position for this window.  With the default gravity it is ignored.
          * When using {@link Gravity#TOP} or {@link Gravity#BOTTOM} it provides

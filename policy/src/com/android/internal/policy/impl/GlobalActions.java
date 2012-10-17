@@ -436,9 +436,7 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
         if ((Settings.System.getInt(mContext.getContentResolver(),
                 Settings.System.POWER_MENU_NAV_CONTROLS_ENABLED, 0) == 1) ||
                 (Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.FULLSCREEN_MODE, 0) == 1) ||
-                (Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.STATUS_BAR_TOGGLED, 0) == 1)) {
+                    Settings.System.FULLSCREEN_MODE, 0) == 1)) {
             mItems.add(mNavBarHideToggle);
         }
 

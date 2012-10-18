@@ -36,6 +36,7 @@
         android:background="@drawable/status_bar_recents_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="@*android:dimen/system_bar_height"
         android:layout_alignParentBottom="true">
 
         <ImageView
@@ -48,7 +49,6 @@
             android:id="@+id/recents_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginRight="0dp"
             android:divider="@null"
             android:stackFromBottom="true"
             android:fadingEdge="vertical"
@@ -68,15 +68,6 @@
 
         </com.android.systemui.recent.RecentsVerticalScrollView>
 
-<<<<<<< HEAD
-    <Button android:id="@+id/recents_task_manager_button"
-            android:layout_gravity="bottom|right"
-            android:layout_marginTop="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:text="@string/recents_task_manager_button_text"/>
-=======
         <ImageView
             android:id="@+id/recents_clear"
             android:clickable="true"
@@ -84,7 +75,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="top|left"
             android:src="@drawable/ic_notify_clear" />
->>>>>>> 7b58494... "Clear all" button on recent apps
 
     </FrameLayout>
 

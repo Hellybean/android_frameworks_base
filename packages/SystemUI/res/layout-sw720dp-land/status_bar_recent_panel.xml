@@ -36,7 +36,9 @@
         android:background="@drawable/status_bar_recents_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentBottom="true">
+        android:layout_alignParentBottom="true"
+        android:clipToPadding="false"
+        android:clipChildren="false">
 
         <ImageView
             android:id="@+id/recents_transition_placeholder_icon"
@@ -44,47 +46,36 @@
             android:layout_height="wrap_content"
             android:visibility="invisible" />
 
-        <com.android.systemui.recent.RecentsVerticalScrollView
-            android:id="@+id/recents_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="0dp"
+        <com.android.systemui.recent.RecentsHorizontalScrollView android:id="@+id/recents_container"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
             android:divider="@null"
             android:stackFromBottom="true"
-            android:fadingEdge="vertical"
+            android:fadingEdge="horizontal"
             android:scrollbars="none"
             android:fadingEdgeLength="@dimen/status_bar_recents_scroll_fading_edge_length"
-            android:layout_gravity="bottom|left"
+            android:layout_gravity="bottom|right"
+            android:orientation="horizontal"
             android:clipToPadding="false"
             android:clipChildren="false">
 
             <LinearLayout android:id="@+id/recents_linear_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
                 android:clipToPadding="false"
                 android:clipChildren="false">
             </LinearLayout>
 
-        </com.android.systemui.recent.RecentsVerticalScrollView>
+        </com.android.systemui.recent.RecentsHorizontalScrollView>
 
-<<<<<<< HEAD
-    <Button android:id="@+id/recents_task_manager_button"
-            android:layout_gravity="bottom|right"
-            android:layout_marginTop="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:text="@string/recents_task_manager_button_text"/>
-=======
         <ImageView
             android:id="@+id/recents_clear"
             android:clickable="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="top|left"
+            android:layout_gravity="top|right"
             android:src="@drawable/ic_notify_clear" />
->>>>>>> 7b58494... "Clear all" button on recent apps
 
     </FrameLayout>
 

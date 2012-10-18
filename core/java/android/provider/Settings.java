@@ -3372,19 +3372,12 @@ public final class Settings {
             Secure.WIFI_WATCHDOG_PING_TIMEOUT_MS;
 
         /**
-         * whether to hide the kill-all-button on recent switcher
-         *
-         * @hide
-         */
-        public static final String RECENT_KILL_ALL_BUTTON = "recent_kill_all_button";
-
-
-        /**
          * whether to hide the tasmanager-button on recent switcher
          *
          * @hide
          */
         public static final String RECENT_TASK_MANAGER_BUTTON = "recent_task_manager_button";
+
     }
 
     /**

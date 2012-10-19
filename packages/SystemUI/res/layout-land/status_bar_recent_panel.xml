@@ -70,7 +70,6 @@
 
         </com.android.systemui.recent.RecentsHorizontalScrollView>
 
-<<<<<<< HEAD
         <Button android:id="@+id/recents_task_manager_button"
             android:layout_gravity="bottom|left"
             android:layout_marginTop="5dp"
@@ -78,7 +77,7 @@
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
             android:text="@string/recents_task_manager_button_text"/>
-=======
+
         <ImageView
             android:id="@+id/recents_clear"
             android:clickable="true"
@@ -86,7 +85,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="top|right"
             android:src="@drawable/ic_notify_clear" />
->>>>>>> 7b58494... "Clear all" button on recent apps
 
     </FrameLayout>
 

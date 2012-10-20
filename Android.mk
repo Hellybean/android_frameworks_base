@@ -49,6 +49,8 @@ SECONDARY_SRC_FILES := $(call find-other-java-files,$(SECONDARY_FRAMEWORKS_SUBDI
 
 LOCAL_SRC_FILES := $(filter-out $(SECONDARY_SRC_FILES),$(LOCAL_SRC_FILES))
 
+
+
 # EventLogTags files.
 LOCAL_SRC_FILES += \
        core/java/android/content/EventLogTags.logtags \
@@ -74,6 +76,8 @@ LOCAL_SRC_FILES := $(filter-out \
 ## across process boundaries.
 ##
 ## READ ME: ########################################################
+
+# BEGIN privacy-added: IPrivacySettingsManager.aidl
 LOCAL_SRC_FILES += \
 	core/java/android/accessibilityservice/IAccessibilityServiceConnection.aidl \
 	core/java/android/accessibilityservice/IAccessibilityServiceClient.aidl \
@@ -216,6 +220,7 @@ LOCAL_SRC_FILES += \
 	media/java/android/media/IMediaScannerService.aidl \
 	media/java/android/media/IRemoteControlClient.aidl \
 	media/java/android/media/IRemoteControlDisplay.aidl \
+	privacy/java/android/privacy/IPrivacySettingsManager.aidl \
 	media/java/android/media/IRemoteVolumeObserver.aidl \
 	media/java/android/media/IRingtonePlayer.aidl \
 	telephony/java/com/android/internal/telephony/IPhoneStateListener.aidl \
@@ -232,7 +237,7 @@ LOCAL_SRC_FILES += \
 	voip/java/android/net/sip/ISipSessionListener.aidl \
 	voip/java/android/net/sip/ISipService.aidl
 #
-
+# END privacy-added: IPrivacySettingsManager.aidl
 
 # FRAMEWORKS_BASE_JAVA_SRC_DIRS comes from build/core/pathmap.mk
 LOCAL_AIDL_INCLUDES += $(FRAMEWORKS_BASE_JAVA_SRC_DIRS)
@@ -275,6 +280,9 @@ framework_built += $(call java-lib-deps,framework2)
 # AIDL files to be preprocessed and included in the SDK,
 # relative to the root of the build tree.
 # ============================================================
+
+# BEGIN privacy-added: PrivacySettings.aidl
+
 aidl_files := \
 	frameworks/base/core/java/android/accounts/IAccountManager.aidl \
 	frameworks/base/core/java/android/accounts/IAccountManagerResponse.aidl \
@@ -322,6 +330,7 @@ aidl_files := \
 	frameworks/base/graphics/java/android/graphics/Region.aidl \
 	frameworks/base/location/java/android/location/Criteria.aidl \
 	frameworks/base/location/java/android/location/Location.aidl \
+	frameworks/base/privacy/java/android/privacy/PrivacySettings.aidl \
 	frameworks/base/telephony/java/android/telephony/ServiceState.aidl \
 	frameworks/base/telephony/java/com/android/internal/telephony/IPhoneSubInfo.aidl \
 	frameworks/base/telephony/java/com/android/internal/telephony/ITelephony.aidl \
@@ -332,6 +341,8 @@ ALL_SDK_FILES += $(gen)
 $(gen): $(aidl_files) | $(AIDL)
 		@echo Aidl Preprocess: $@
 		$(hide) $(AIDL) --preprocess $@ $(PRIVATE_SRC_FILES)
+
+# END privacy-added: PrivacySettings.aidl
 
 # the documentation
 # ============================================================

@@ -161,6 +161,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import dalvik.system.Zygote;
 
+// BEGIN privacy-added
+import android.privacy.surrogate.PrivacyActivityManagerService;
+// END privacy-added
+
 public final class ActivityManagerService extends ActivityManagerNative
         implements Watchdog.Monitor, BatteryStatsImpl.BatteryCallback {
     private static final String USER_DATA_DIR = "/data/user/";

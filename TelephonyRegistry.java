@@ -57,7 +57,7 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
     private static final String TAG = "TelephonyRegistry";
     private static final boolean DBG = false;
 
-    public static class Record {
+    private static class Record {
         String pkgForDebug;
 
         IBinder binder;
@@ -67,7 +67,7 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
         int events;
     }
 
-    protected final Context mContext;
+    private final Context mContext;
 
     // access should be inside synchronized (mRecords) for these two fields
     protected final ArrayList<IBinder> mRemoveList = new ArrayList<IBinder>();
@@ -125,7 +125,7 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
     // calls go through a oneway interface and local calls going through a
     // handler before they get to app code.
 
-    protected TelephonyRegistry(Context context) {
+    public TelephonyRegistry(Context context) {
         CellLocation  location = CellLocation.getEmpty();
 
         // Note that location can be null for non-phone builds like
@@ -254,7 +254,7 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
         }
     }
 
-    protected void remove(IBinder binder) {
+    private void remove(IBinder binder) {
         synchronized (mRecords) {
             final int recordCount = mRecords.size();
             for (int i = 0; i < recordCount; i++) {

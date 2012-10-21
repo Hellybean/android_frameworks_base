@@ -722,7 +722,7 @@ public class PhoneStatusBar extends BaseStatusBar {
         View volumeLayout = mStatusBarWindow.findViewById(R.id.volume_layout);
         volumeLayout.setVisibility(show ? View.VISIBLE : View.GONE);
         ToggleSlider volume = (ToggleSlider) mStatusBarWindow.findViewById(R.id.volume);
-        if (mVolume == null && show) mVolume = new VolumeController(mContext, volume);
+        if (show) mVolume = new VolumeController(mContext, volume);
     }
 
     @Override

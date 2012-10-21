@@ -3944,4 +3944,9 @@
   <java-symbol type="id" name="navbarhome" />
   <java-symbol type="id" name="navbarback" />
   <java-symbol type="id" name="navbarmenu" />
+
+  <!-- Sense 4 -->
+  <java-symbol type="dimen" name="thumbnail_height_sense4"/>
+  <java-symbol type="dimen" name="thumbnail_width_sense4"/>
+
 </resources>

@@ -56,6 +56,7 @@ import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.os.SystemClock;
 import android.provider.Settings;
+import android.provider.Settings.SettingNotFoundException;
 import android.text.Editable;
 import android.text.TextUtils.TruncateAt;
 import android.text.TextWatcher;
@@ -145,6 +146,7 @@ public class PhoneStatusBar extends BaseStatusBar {
     private boolean mBrightnessControl;
     private boolean mAutoBrightness;
     private boolean mHighEndGfx;
+    private boolean useSenseView;
 
     private static final int NOTIFICATION_PRIORITY_MULTIPLIER = 10; // see NotificationManagerService
     private static final int HIDE_ICONS_BELOW_SCORE = Notification.PRIORITY_LOW * NOTIFICATION_PRIORITY_MULTIPLIER;
@@ -276,6 +278,7 @@ public class PhoneStatusBar extends BaseStatusBar {
     CustomTheme mCurrentTheme;
     private boolean mRecreating = false;
 
+
     private AnimatorSet mLightsOutAnimation;
     private AnimatorSet mLightsOnAnimation;
 
@@ -313,6 +316,8 @@ public class PhoneStatusBar extends BaseStatusBar {
                     Settings.System.STATUS_BAR_TRANSPARENCY), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NOTIFICATION_PANEL_TRANSPARENCY), false, this);
+            resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.SENSE4_RECENT_APPS), false, this);
             update();
         }
 
@@ -330,9 +335,12 @@ public class PhoneStatusBar extends BaseStatusBar {
                     resolver, Settings.System.STATUS_BAR_BRIGHTNESS_CONTROL, 0) == 1;
             mHighEndGfx = Settings.System.getInt(resolver,
                     Settings.System.HIGH_END_GFX_ENABLED, 0) != 0;
+            useSenseView = (Settings.System.getInt(resolver,
+                    Settings.System.SENSE4_RECENT_APPS, 0) == 1);
             setStatusBarParams(mStatusBarView);
             setNotificationPanelParams(mNotificationPanel);
 //	    setNotificationPanelParams(mNavigationBarView);
+	    updateRecentsPanel();
         }
     }
 
@@ -741,7 +749,11 @@ public class PhoneStatusBar extends BaseStatusBar {
     }
 
     protected void updateRecentsPanel() {
-        super.updateRecentsPanel(R.layout.status_bar_recent_panel);
+        if (useSenseView) {
+            super.updateRecentsPanel(R.layout.status_bar_recent_panel_sense4);
+        } else {
+            super.updateRecentsPanel(R.layout.status_bar_recent_panel);
+        }
         // Make .03 alpha the minimum so you always see the item a bit-- slightly below
         // .03, the item disappears entirely (as if alpha = 0) and that discontinuity looks
         // a bit jarring
@@ -2964,4 +2976,5 @@ public class PhoneStatusBar extends BaseStatusBar {
         public void setBounds(Rect bounds) {
         }
     }
+
 }

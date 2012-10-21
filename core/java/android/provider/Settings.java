@@ -3032,6 +3032,7 @@ public final class Settings {
           */
          public static final String KEY_APP_SWITCH_ACTION = "key_app_switch_action";
 
+
          /**
           * Action to perform when the app switch key is long-pressed. (Default is 0)
           * (See KEY_HOME_LONG_PRESS_ACTION for valid values)
@@ -3064,6 +3065,14 @@ public final class Settings {
          * @hide
          */
         public static final String NAVIGATION_CONTROLS = "navigation_controls";
+
+
+          /**
+           * Toggle to render the recent apps view resembling sense 4.0
+           * @hide
+           */
+           public static final String SENSE4_RECENT_APPS = "sense4_recent_apps";
+
 
         /**
          * Settings to backup. This is here so that it's in the same place as the settings

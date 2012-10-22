@@ -40,7 +40,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnTouchListener;
+import android.view.View.OnLongClickListener;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
@@ -53,7 +53,7 @@ import com.android.internal.R;
  * This widget display an analogic clock with two hands for hours and
  * minutes.
  */
-public class ClockStock extends TextView implements OnClickListener, OnTouchListener {
+public class ClockStock extends TextView implements OnClickListener, OnLongClickListener {
     private boolean mAttached;
     private Calendar mCalendar;
     private String mClockFormatString;
@@ -77,7 +77,7 @@ public class ClockStock extends TextView implements OnClickListener, OnTouchList
     public ClockStock(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
             setOnClickListener(this);
-            setOnTouchListener(this);
+            setOnLongClickListener(this);
 
         mDefaultColor = getCurrentTextColor();
     }
@@ -215,9 +215,7 @@ public class ClockStock extends TextView implements OnClickListener, OnTouchList
         return result;
 
     }
-    @Override
-    public void onClick(View v) {
-        setTextColor(mDefaultColor);
+    private void collapseStartActivity(Intent what) {
 
         // collapse status bar
         StatusBarManager statusBarManager = (StatusBarManager) getContext().getSystemService(
@@ -231,22 +229,27 @@ public class ClockStock extends TextView implements OnClickListener, OnTouchList
             // no action needed here
         }
 
-        // start alarm clock intent
-        Intent intent = new Intent(AlarmClock.ACTION_SET_ALARM);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        mContext.startActivity(intent);
+        // start activity
+        what.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        mContext.startActivity(what);
     }
 
     @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        int a = event.getAction();
-        if (a == MotionEvent.ACTION_DOWN) {
-            setTextColor(getResources().getColor(R.color.holo_blue_light));
-        } else if (a == MotionEvent.ACTION_CANCEL || a == MotionEvent.ACTION_UP) {
-            setTextColor(mDefaultColor);
-        }
-        // never consume touch event, so onClick is propperly processed
-        return false;
+    public void onClick(View v) {
+        setTextColor(mDefaultColor);
+        Intent intent = new Intent(AlarmClock.ACTION_SET_ALARM);
+        collapseStartActivity(intent);
+    }
+
+    @Override
+    public boolean onLongClick(View v) {
+        setTextColor(mDefaultColor);
+        Intent intent = new Intent("android.settings.DATE_SETTINGS");
+        intent.addCategory(Intent.CATEGORY_DEFAULT);
+        collapseStartActivity(intent);
+
+        // consume event
+        return true;
     }
 }
 

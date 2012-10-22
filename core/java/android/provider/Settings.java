@@ -2953,6 +2953,12 @@ public final class Settings {
          */
         public static final String HIGH_END_GFX_ENABLED = "high_end_gfx_enabled";
 
+	/**
+         * Whether to display high end graphics effects on higher end devices
+         * @hide
+         */
+        public static final String HIGH_END_GFX_DISABLED = "high_end_gfx_disabled";
+
         /**
          * Whether power menu airplane toggle is enabled
          * @hide

@@ -120,6 +120,7 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
     private int mRecentItemLayoutId;
     private boolean mFirstScreenful = true;
     private boolean mHighEndGfx;
+    private boolean mDisableHighEndGfx;
 
     private boolean useSenseView;
 
@@ -525,6 +526,8 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
         mChoreo = new Choreographer(this, mRecentsScrim, mRecentsContainer, mRecentsNoApps, this);
         mHighEndGfx = Settings.System.getInt(mContext.getContentResolver(),
 	                Settings.System.HIGH_END_GFX_ENABLED, 0) != 0;
+        mDisableHighEndGfx = Settings.System.getInt(mContext.getContentResolver(),
+	                Settings.System.HIGH_END_GFX_DISABLED, 0) != 0;
 
         mClearRecents = (ImageView) findViewById(R.id.recents_clear);
         if (mClearRecents != null){
@@ -568,9 +571,9 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
         if (mRecentsScrim != null) {
             Display d = ((WindowManager)mContext.getSystemService(Context.WINDOW_SERVICE))
                 .getDefaultDisplay();
-	if(!mHighEndGfx)
+	if(!mHighEndGfx || mDisableHighEndGfx)
             mHighEndGfx = ActivityManager.isHighEndGfx(d);
-            if (!mHighEndGfx) {
+            if (!mHighEndGfx || mDisableHighEndGfx) {
                 mRecentsScrim.setBackground(null);
             } else if (mRecentsScrim.getBackground() instanceof BitmapDrawable) {
                 // In order to save space, we make the background texture repeat in the Y direction

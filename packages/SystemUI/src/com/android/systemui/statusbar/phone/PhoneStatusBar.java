@@ -144,7 +144,7 @@ public class PhoneStatusBar extends BaseStatusBar {
     private static final int BRIGHTNESS_CONTROL_LINGER_THRESHOLD = 20;
 
     private boolean mBrightnessControl;
-    private boolean mAutoBrightness;
+    private boolean mDisableHighEndGfx;
     private boolean mHighEndGfx;
     private boolean useSenseView;
 
@@ -313,6 +313,8 @@ public class PhoneStatusBar extends BaseStatusBar {
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.HIGH_END_GFX_ENABLED), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
+                    Settings.System.HIGH_END_GFX_DISABLED), false, this);
+            resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.STATUS_BAR_TRANSPARENCY), false, this);
             resolver.registerContentObserver(Settings.System.getUriFor(
                     Settings.System.NOTIFICATION_PANEL_TRANSPARENCY), false, this);
@@ -335,6 +337,8 @@ public class PhoneStatusBar extends BaseStatusBar {
                     resolver, Settings.System.STATUS_BAR_BRIGHTNESS_CONTROL, 0) == 1;
             mHighEndGfx = Settings.System.getInt(resolver,
                     Settings.System.HIGH_END_GFX_ENABLED, 0) != 0;
+            mDisableHighEndGfx = Settings.System.getInt(resolver,
+                    Settings.System.HIGH_END_GFX_DISABLED, 0) != 0;
             useSenseView = (Settings.System.getInt(resolver,
                     Settings.System.SENSE4_RECENT_APPS, 0) == 1);
             setStatusBarParams(mStatusBarView);
@@ -489,7 +493,7 @@ public class PhoneStatusBar extends BaseStatusBar {
 //                Settings.System.NOTIFICATION_PANEL_COLOR, 0xFF000000);
 //        color = Color.rgb(Color.red(color), Color.green(color), Color.blue(color));
 
-        if (!ActivityManager.isHighEndGfx(mDisplay) && !mHighEndGfx) {
+        if ((!ActivityManager.isHighEndGfx(mDisplay) && !mHighEndGfx) || mDisableHighEndGfx) {
 
             mStatusBarWindow.setBackground(null);
             mNotificationPanel.setBackground(new FastColorDrawable(context.getResources().getColor(
@@ -711,7 +715,7 @@ public class PhoneStatusBar extends BaseStatusBar {
                 | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM
                 | WindowManager.LayoutParams.FLAG_SPLIT_TOUCH,
                 (opaque ? PixelFormat.OPAQUE : PixelFormat.TRANSLUCENT));
-        if (ActivityManager.isHighEndGfx(mDisplay) || mHighEndGfx) {
+        if ((ActivityManager.isHighEndGfx(mDisplay) && !mDisableHighEndGfx) || mHighEndGfx) {
             lp.flags |= WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED;
         } else {
             lp.flags |= WindowManager.LayoutParams.FLAG_DIM_BEHIND;
@@ -736,7 +740,7 @@ public class PhoneStatusBar extends BaseStatusBar {
                 | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM
                 | WindowManager.LayoutParams.FLAG_SPLIT_TOUCH,
                 (opaque ? PixelFormat.OPAQUE : PixelFormat.TRANSLUCENT));
-        if (ActivityManager.isHighEndGfx(mDisplay) || mHighEndGfx) {
+        if ((ActivityManager.isHighEndGfx(mDisplay) && !mDisableHighEndGfx) || mHighEndGfx) {
             lp.flags |= WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED;
         }
         lp.gravity = Gravity.BOTTOM | Gravity.LEFT;
@@ -890,7 +894,7 @@ public class PhoneStatusBar extends BaseStatusBar {
                     | WindowManager.LayoutParams.FLAG_SPLIT_TOUCH,
                 PixelFormat.TRANSLUCENT);
         // this will allow the navbar to run in an overlay on devices that support this
-        if (ActivityManager.isHighEndGfx(mDisplay) || mHighEndGfx) {
+        if ((ActivityManager.isHighEndGfx(mDisplay) && !mDisableHighEndGfx) || mHighEndGfx) {
             lp.flags |= WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED;
         }
 
@@ -2488,7 +2492,7 @@ public class PhoneStatusBar extends BaseStatusBar {
         final int barh = getCloseViewHeight() + getStatusBarHeight();
         final float frac = saturate((float)(panelh - barh) / (disph - barh));
 
-        if (DIM_BEHIND_EXPANDED_PANEL && ActivityManager.isHighEndGfx(mDisplay) ||
+        if (DIM_BEHIND_EXPANDED_PANEL && ActivityManager.isHighEndGfx(mDisplay) && !mDisableHighEndGfx||
                 (DIM_BEHIND_EXPANDED_PANEL && mHighEndGfx)) {
             // woo, special effects
             final float k = (float)(1f-0.5f*(1f-Math.cos(3.14159f * Math.pow(1f-frac, 2.2f))));

@@ -2489,6 +2489,12 @@ public final class Settings {
         public static final String EDGE_SWIPE_BLACKLIST = "edge_swipe_blacklist";
 
         /**
+         * Whether to allow killing of the foreground app by long-pressing the Back button
+         * @hide
+         */
+        public static final String KILL_APP_LONGPRESS_BACK = "kill_app_longpress_back";
+
+        /**
          * @hide
          */
         public static final String SHOW_GESTURES = "show_gestures";
@@ -5306,11 +5312,6 @@ public final class Settings {
          */
         public static final String ANR_SHOW_BACKGROUND = "anr_show_background";
 
-        /**
-         * Whether to allow killing of the foreground app by long-pressing the Back button
-         * @hide
-         */
-        public static final String KILL_APP_LONGPRESS_BACK = "kill_app_longpress_back";
 
         /**
          * The {@link ComponentName} string of the service to be used as the voice recognition

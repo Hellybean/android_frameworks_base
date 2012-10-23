@@ -2246,6 +2246,7 @@ public final class Settings {
         public static final String LOCKSCREEN_DISABLED = "lockscreen.disabled";
 
         /**
+<<<<<<< HEAD
          * Whether the lockscreen vibrate should be enabled.
          * @hide
          */
@@ -2264,6 +2265,8 @@ public final class Settings {
         public static final String LOCKSCREEN_TARGETS = "lockscreen_targets";
 
         /**
+=======
+>>>>>>> 8ae5af8... Framework : Lockscreen - Customizable shortcuts
          * URI for the low battery sound file.
          * @hide
          */

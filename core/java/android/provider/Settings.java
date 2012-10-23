@@ -2976,19 +2976,6 @@ public final class Settings {
          */
         public static final String POWER_MENU_NAV_CONTROLS_ENABLED = "power_menu_nav_controls_enabled";
 
-
-        /**
-         * Whether power menu airplane toggle is enabled
-         * @hide
-         */
-        public static final String POWER_MENU_AIRPLANE_ENABLED = "power_menu_airplane_enabled";
-
-        /**
-         * Whether power menu silent mode is enabled
-         * @hide
-         */
-        public static final String POWER_MENU_SILENT_ENABLED = "power_menu_silent_enabled";
-
         /**
          * Whether to enable custom rebindings of the actions performed on
          * certain key press events.

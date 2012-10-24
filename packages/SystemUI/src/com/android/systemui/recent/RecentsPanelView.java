@@ -18,6 +18,7 @@ package com.android.systemui.recent;
 
 import android.animation.Animator;
 import android.animation.LayoutTransition;
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManagerNative;
 import android.app.ActivityOptions;
@@ -1036,12 +1037,11 @@ public class RecentsPanelView extends FrameLayout implements OnItemClickListener
     }
 
     private void opentaskmanager() {
-    	PackageManager pm = getContext().getPackageManager();
-    	Intent appStartIntent = pm.getLaunchIntentForPackage("com.eolwral.osmonitor");
-    	if (null != appStartIntent)
-    	{
-    	    getContext().startActivity(appStartIntent);
-    	}
+        Intent manageApps = new Intent(Settings.ACTION_MANAGE_ALL_APPLICATIONS_SETTINGS);
+        manageApps.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                | Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+	    setVisibility(INVISIBLE);
+    	    getContext().startActivity(manageApps);
     }
 
     public void addContainer(View container){

@@ -24,7 +24,8 @@
     <!-- FrameLayout used as scrim to show between album art and buttons -->
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="360dip">
+        android:layout_height="match_parent"
+        android:foreground="@drawable/ic_lockscreen_player_background">
         <!-- We use ImageView for its cropping features, otherwise could be android:background -->
         <ImageView
             android:id="@+id/albumart"
@@ -40,8 +41,7 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:layout_marginBottom="100dip">
+        android:layout_gravity="bottom">
         <TextView
             android:id="@+id/title"
             android:layout_width="match_parent"

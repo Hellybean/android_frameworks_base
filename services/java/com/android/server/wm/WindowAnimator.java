@@ -287,7 +287,17 @@ public class WindowAnimator {
                         mService.mFocusMayChange = true;
                     }
                     if (win.isReadyForDisplay()) {
-                            mForceHiding = KEYGUARD_NOT_SHOWN;
+                        if (Settings.System.getInt(mContext.getContentResolver(),
+                                    Settings.System.LOCKSCREEN_SEE_THROUGH, 0) != 0 ||
+                                    nowAnimating) {
+                            if (winAnimator.mAnimationIsEntrance) {
+                                mForceHiding = KEYGUARD_ANIMATING_IN;
+                            } else {
+                                mForceHiding = KEYGUARD_ANIMATING_OUT;
+                            }
+                        } else {
+                            mForceHiding = KEYGUARD_SHOWN;
+                        }
                     }
                     if (WindowManagerService.DEBUG_VISIBILITY) Slog.v(TAG,
                             "Force hide " + mForceHiding

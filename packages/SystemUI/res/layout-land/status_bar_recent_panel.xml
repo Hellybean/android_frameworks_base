@@ -71,7 +71,7 @@
         </com.android.systemui.recent.RecentsHorizontalScrollView>
 
         <Button android:id="@+id/recents_task_manager_button"
-            android:layout_gravity="bottom|left"
+            android:layout_gravity="top|left"
             android:layout_marginTop="5dp"
             android:layout_marginRight="5dp"
             android:layout_height="wrap_content"

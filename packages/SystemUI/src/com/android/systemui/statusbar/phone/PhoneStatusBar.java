@@ -349,8 +349,6 @@ public class PhoneStatusBar extends BaseStatusBar {
             useSenseView = (Settings.System.getInt(resolver,
                     Settings.System.SENSE4_RECENT_APPS, 0) == 1);
             setStatusBarParams(mStatusBarView);
-            mSettingsButton.setVisibility(Settings.System.getInt(mContext.getContentResolver(),
-                    Settings.System.ACTIVE_USER_ID, 0) != 0 ? View.GONE : View.VISIBLE);
             refreshStatusBarVolume();
             setNotificationPanelParams(mNotificationPanel);
 //	    setNotificationPanelParams(mNavigationBarView);

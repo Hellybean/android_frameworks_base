@@ -3087,6 +3087,12 @@ public final class Settings {
          */
         public static final String LOCKSCREEN_STYLE = "lockscreen_style";
 
+        /**
+         * custom lockscreen text color
+         * @hide
+         */
+        public static final String LOCKSCREEN_CUSTOM_TEXT_COLOR = "lockscreen_custom_text_color";
+
 
         /**
          * Settings to backup. This is here so that it's in the same place as the settings

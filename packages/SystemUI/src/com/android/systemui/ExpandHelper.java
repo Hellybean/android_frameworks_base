@@ -496,6 +496,7 @@ public class ExpandHelper implements Gefingerpoken, OnClickListener {
         mExpansionStyle = expandType; 
         if (DEBUG) Slog.d(TAG, "scale type " + expandType + " beginning on view: " + v);
         mCallback.setUserLockedChild(v, true);
+	setGlow(0f);
         setView(v);
         setGlow(GLOW_BASE);
         mScaler.setView(v);

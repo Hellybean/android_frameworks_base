@@ -3111,6 +3111,8 @@ public final class Settings {
          * ( 1 - MultiwaveView: ICS )
          * ( 2 - Tabs: GB   )
          * ( 3 - Rotary: Eclair )
+         * ( 4 - WaveView: Blackberry 10 )
+         * ( 5 - WaveView: Optimus 4x)
          * @hide
          */
         public static final String LOCKSCREEN_STYLE = "lockscreen_style";
@@ -3120,6 +3122,12 @@ public final class Settings {
          * @hide
          */
         public static final String LOCKSCREEN_CUSTOM_TEXT_COLOR = "lockscreen_custom_text_color";
+
+        /**
+         * Sets bg color of alt lockscreen bg
+         * @hide
+         */
+        public static final String ALT_LOCK_BG_COLOR = "alt_lock_bg_color";
 
 
         /**

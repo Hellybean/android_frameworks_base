@@ -71,7 +71,6 @@ public class NavigationBarView extends LinearLayout {
     private OnClickListener mRecentsClickListener;
     private RecentsPanelView mRecentsPanel;
     private OnTouchListener mHomeSearchActionListener;
-    private boolean mIs600dp;
 
     protected IStatusBarService mBarService;
     final Display mDisplay;
@@ -182,9 +181,6 @@ public class NavigationBarView extends LinearLayout {
         mBarSize = res.getDimensionPixelSize(R.dimen.navigation_bar_size);
         mVertical = false;
         mShowMenu = false;
-        //Silly way to identify 600dp
-        //TODO come up with a better way
-        mIs600dp = res.getInteger(R.integer.notification_panel_layout_gravity) == 49;
         mDelegateHelper = new DelegateViewHelper(this);
         updateResources();
 
@@ -452,7 +448,7 @@ public class NavigationBarView extends LinearLayout {
         }
         mCurrentView = mRotatedViews[rot];
         mCurrentView.setVisibility(View.VISIBLE);
-        if (!mIs600dp) {
+        if (!NavbarEditor.isDeviceHybrid(mContext)) {
             mVertical = (rot == Surface.ROTATION_90 || rot == Surface.ROTATION_270);
         } else {
             mVertical = getWidth() > 0 && getHeight() > getWidth();

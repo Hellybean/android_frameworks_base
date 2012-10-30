@@ -207,7 +207,6 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
         }
 
         mNavBarHideToggle = new NavBarAction(mHandler, mStatusBarManager);
-
         mExpandDesktopModeOn = new ToggleAction(
                 R.drawable.ic_lock_expanded_desktop,
                 R.drawable.ic_lock_expanded_desktop,
@@ -220,7 +219,7 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
             }
 
             public boolean showDuringKeyguard() {
-                return true;
+                return false;
             }
 
             public boolean showBeforeProvisioning() {

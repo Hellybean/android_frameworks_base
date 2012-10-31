@@ -2541,6 +2541,13 @@ public final class Settings {
         public static final String WIDGET_BUTTONS = "expanded_widget_buttons";
 
         /**
+         * Enable Notification Toggles Icon Color
+         *
+         * @hide
+         */
+        public static final String ENABLE_TOGGLE_COLORS = "enable_toggle_colors";
+
+        /**
          * Notification Toggles Icon Color (On)
          *
          * @hide
@@ -2553,6 +2560,13 @@ public final class Settings {
          * @hide
          */
         public static final String TOGGLE_ICON_OFF_COLOR = "toggle_icon_color_off";
+
+        /**
+         * Enable Notification Toggles Bar
+         *
+         * @hide
+         */
+        public static final String ENABLE_TOGGLE_BAR = "enable_toggle_bar";
 
         /**
          * Widget Buttons to Use - Tablet

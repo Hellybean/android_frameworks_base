@@ -1174,6 +1174,15 @@ class KeyguardStatusViewManager implements OnClickListener {
             if (DEBUG) ne.printStackTrace();
         }
 
+        // calendar view
+        try {
+            mCalendarEventTitle.setTextColor(color);
+            mCalendarEventDetails.setTextColor(color);
+            if (DEBUG) Log.d(TAG, String.format("Setting calendar text color to %d", color));
+        } catch (NullPointerException ne) {
+            if (DEBUG) ne.printStackTrace();
+        }
+
         // date view
         try {
             mDateView.setTextColor(color);

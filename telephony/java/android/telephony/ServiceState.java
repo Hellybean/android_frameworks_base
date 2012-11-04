@@ -484,7 +484,7 @@ public class ServiceState implements Parcelable {
                 + " EmergOnly=" + mIsEmergencyOnly);
     }
 
-   void setNullState(int state) {
+    private void setNullState(int state) {
         mState = state;
         mRoaming = false;
         mOperatorAlphaLong = null;

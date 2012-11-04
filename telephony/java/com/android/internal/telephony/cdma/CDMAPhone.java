@@ -831,7 +831,7 @@ public class CDMAPhone extends PhoneBase {
          super.notifyServiceStateChangedP(ss);
      }
 
-     public void notifyLocationChanged() {
+     void notifyLocationChanged() {
          mNotifier.notifyCellLocation(this);
      }
 

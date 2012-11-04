@@ -47,12 +47,8 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.os.Registrant;
 import android.os.RegistrantList;
-import android.os.ServiceManager;
 import android.os.SystemClock;
 import android.os.SystemProperties;
-import android.privacy.IPrivacySettingsManager;
-import android.privacy.PrivacySettings;
-import android.privacy.PrivacySettingsManager;
 import android.provider.Settings;
 import android.provider.Settings.SettingNotFoundException;
 import android.provider.Telephony.Intents;
@@ -72,7 +68,6 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Random;
 import java.util.TimeZone;
 
 /**
@@ -86,12 +81,7 @@ final class GsmServiceStateTracker extends ServiceStateTracker {
     GsmCellLocation cellLoc;
     GsmCellLocation newCellLoc;
     int mPreferredNetworkType;
-    
-    //--------------------------------------------------------------------------
-    private Context mContext;
-    private PrivacySettingsManager pSetMan;
-    //--------------------------------------------------------------------------
-    
+
     private int gprsState = ServiceState.STATE_OUT_OF_SERVICE;
     private int newGPRSState = ServiceState.STATE_OUT_OF_SERVICE;
     private int mMaxDataCalls = 1;
@@ -247,13 +237,7 @@ final class GsmServiceStateTracker extends ServiceStateTracker {
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_LOCALE_CHANGED);
         phone.getContext().registerReceiver(mIntentReceiver, filter);
-        
-        //--------------------------------------------------------------------------
-        this.mContext = phone.getContext();
-        pSetMan = new PrivacySettingsManager(mContext, IPrivacySettingsManager.Stub.asInterface(ServiceManager.getService("privacy")));
-        //--------------------------------------------------------------------------
-        
-        
+
         // Gsm doesn't support OTASP so its not needed
         phone.notifyOtaspChanged(OTASP_NOT_NEEDED);
     }
@@ -367,24 +351,8 @@ final class GsmServiceStateTracker extends ServiceStateTracker {
                             Log.w(LOG_TAG, "error parsing location: " + ex);
                         }
                     }
-                    //---------------------------------------------------------------------------------------------------------------------
-                    PrivacySettings settings = pSetMan.getSettings(mContext.getPackageName(), 0);
-                    if(pSetMan != null && settings != null && settings.getLocationNetworkSetting() == PrivacySettings.EMPTY){
-                    	//we will update with invalid cell location values
-                    	cellLoc.setStateInvalid();
-                    	phone.notifyLocationChanged();
-                    }
-                    else if(pSetMan != null && settings != null && settings.getLocationNetworkSetting() == PrivacySettings.RANDOM){
-                    	Random values = new Random();
-                    	cellLoc.setLacAndCid(values.nextInt(), values.nextInt());
-                        phone.notifyLocationChanged();
-                    }
-                    else{
-                    	cellLoc.setLacAndCid(lac, cid);
-                        phone.notifyLocationChanged();
-                    }
-                    //---------------------------------------------------------------------------------------------------------------------
-                    
+                    cellLoc.setLacAndCid(lac, cid);
+                    phone.notifyLocationChanged();
                 }
 
                 // Release any temporary cell lock, which could have been
@@ -529,19 +497,8 @@ final class GsmServiceStateTracker extends ServiceStateTracker {
 
     protected void updateSpnDisplay() {
         int rule = phone.mIccRecords.getDisplayRule(ss.getOperatorNumeric());
-        PrivacySettings settings = pSetMan.getSettings(mContext.getPackageName(), 0);
-	String spn;
-        //--------------------------------------------------------------------------------------------------------------------------------
-        //this part is needed because we do not changed the IccRecord class
-        if(pSetMan != null && settings != null && settings.getNetworkInfoSetting() != PrivacySettings.REAL){
-        	spn = "";
-        }
-        else{
-        	spn = phone.mIccRecords.getServiceProviderName();
-        }
-        //--------------------------------------------------------------------------------------------------------------------------------
-        
-        String plmn = ss.getOperatorAlphaLong(); //we can do this, because catched it before
+        String spn = phone.mIccRecords.getServiceProviderName();
+        String plmn = ss.getOperatorAlphaLong();
 
         // For emergency calls only, pass the EmergencyCallsOnly string via EXTRA_PLMN
         if (mEmergencyOnly && cm.getRadioState().isOn()) {
@@ -611,7 +568,6 @@ final class GsmServiceStateTracker extends ServiceStateTracker {
                         ar.exception);
             }
         } else try {
-        	PrivacySettings settings = pSetMan.getSettings(mContext.getPackageName(), 0);
             switch (what) {
                 case EVENT_POLL_STATE_REGISTRATION:
                     states = (String[])ar.result;
@@ -651,23 +607,8 @@ final class GsmServiceStateTracker extends ServiceStateTracker {
                     }
 
                     // LAC and CID are -1 if not avail
-                    //--------------------------------------------------------------------------------------------------------------------------------
-                    if(pSetMan != null && settings != null && settings.getLocationNetworkSetting() == PrivacySettings.EMPTY){
-                    	//we will update with invalid cell location values
-                    	newCellLoc.setStateInvalid();
-                        newCellLoc.setPsc(psc);
-                    }
-                    else if(pSetMan != null && settings != null && settings.getLocationNetworkSetting() == PrivacySettings.RANDOM){
-                    	Random values = new Random();
-                    	newCellLoc.setLacAndCid(values.nextInt(), values.nextInt());
-                        newCellLoc.setPsc(psc);
-                    }
-                    else{
-                    	newCellLoc.setLacAndCid(lac, cid);
-                        newCellLoc.setPsc(psc);
-                    }
-                    //--------------------------------------------------------------------------------------------------------------------------------
-                    
+                    newCellLoc.setLacAndCid(lac, cid);
+                    newCellLoc.setPsc(psc);
                 break;
 
                 case EVENT_POLL_STATE_GPRS:
@@ -705,14 +646,7 @@ final class GsmServiceStateTracker extends ServiceStateTracker {
                     String opNames[] = (String[])ar.result;
 
                     if (opNames != null && opNames.length >= 3) {
-                    	//--------------------------------------------------------------------------------------------------------------------------------
-                        if(pSetMan != null && settings != null && settings.getNetworkInfoSetting() != PrivacySettings.REAL){
-                        	newSS.setOperatorName ("", "", "");
-                        }
-                        else{
-                        	newSS.setOperatorName (opNames[0], opNames[1], opNames[2]);
-                        }
-                        //--------------------------------------------------------------------------------------------------------------------------------
+                         newSS.setOperatorName (opNames[0], opNames[1], opNames[2]);
                     }
                 break;
 
@@ -1066,7 +1000,7 @@ final class GsmServiceStateTracker extends ServiceStateTracker {
         }
 
         if (hasLocationChanged) {
-            phone.notifyLocationChanged(); //we can notify, because all sensitive data has changed before @author CollegeDev
+            phone.notifyLocationChanged();
         }
 
         if (! isGprsConsistent(gprsState, ss.getState())) {

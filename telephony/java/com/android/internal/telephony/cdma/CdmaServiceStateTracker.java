@@ -40,12 +40,8 @@ import android.os.Message;
 import android.os.PowerManager;
 import android.os.Registrant;
 import android.os.RegistrantList;
-import android.os.ServiceManager;
 import android.os.SystemClock;
 import android.os.SystemProperties;
-import android.privacy.IPrivacySettingsManager;
-import android.privacy.PrivacySettings;
-import android.privacy.PrivacySettingsManager;
 import android.provider.Settings;
 import android.provider.Settings.Secure;
 import android.provider.Settings.SettingNotFoundException;
@@ -63,7 +59,6 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Random;
 import java.util.TimeZone;
 
 /**
@@ -122,11 +117,6 @@ public class CdmaServiceStateTracker extends ServiceStateTracker {
     String mSavedTimeZone;
     long mSavedTime;
     long mSavedAtTime;
-    
-    //-------------------------------------------------------------------------------------------------------------------------------------------------
-    private Context mContext;
-    private PrivacySettingsManager pSetMan;
-    //-------------------------------------------------------------------------------------------------------------------------------------------------
 
     /**
      * We can't register for SIM_RECORDS_LOADED immediately because the
@@ -218,11 +208,6 @@ public class CdmaServiceStateTracker extends ServiceStateTracker {
         setSignalStrengthDefaultValues();
 
         mNeedToRegForRuimLoaded = true;
-        
-        //-------------------------------------------------------------------------------------------------------------------------------------------------
-        this.mContext = phone.getContext();
-        pSetMan = new PrivacySettingsManager(mContext, IPrivacySettingsManager.Stub.asInterface(ServiceManager.getService("privacy")));
-        //-------------------------------------------------------------------------------------------------------------------------------------------------
     }
 
     public void dispose() {
@@ -397,21 +382,10 @@ public class CdmaServiceStateTracker extends ServiceStateTracker {
                         loge("error parsing cell location data: " + ex);
                     }
                 }
-                //----------------------------------------------------------------------------------------------------------------------------------------------------------
-                PrivacySettings settings = pSetMan.getSettings(mContext.getPackageName(), 0);
-                if(pSetMan != null && settings != null && settings.getLocationNetworkSetting() == PrivacySettings.EMPTY){
-                	//we will update with invalid cell location values
-                	cellLoc.setStateInvalid();
-                }
-                else if(pSetMan != null && settings != null && settings.getLocationNetworkSetting() == PrivacySettings.RANDOM){
-                	Random values = new Random();
-                	cellLoc.setCellLocationData(values.nextInt(), values.nextInt(), values.nextInt(), values.nextInt(), values.nextInt());
-                }
-                else{
-                	cellLoc.setCellLocationData(baseStationId, baseStationLatitude, baseStationLongitude, systemId, networkId);
-                }
+
+                cellLoc.setCellLocationData(baseStationId, baseStationLatitude,
+                        baseStationLongitude, systemId, networkId);
                 phone.notifyLocationChanged();
-                //----------------------------------------------------------------------------------------------------------------------------------------------------------
             }
 
             // Release any temporary cell lock, which could have been
@@ -599,7 +573,6 @@ public class CdmaServiceStateTracker extends ServiceStateTracker {
     protected void handlePollStateResultMessage(int what, AsyncResult ar){
         int ints[];
         String states[];
-  	PrivacySettings settings = pSetMan.getSettings(mContext.getPackageName(), 0);
         switch (what) {
         case EVENT_POLL_STATE_REGISTRATION_CDMA: // Handle RIL_REQUEST_REGISTRATION_STATE.
             states = (String[])ar.result;
@@ -689,19 +662,8 @@ public class CdmaServiceStateTracker extends ServiceStateTracker {
 
 
             // Values are -1 if not available.
-            //-------------------------------------------------------------------------------------------------------------------------------------------------------------
-            if(pSetMan != null && settings != null && settings.getLocationNetworkSetting() == PrivacySettings.EMPTY){
-            	//we will update with invalid cell location and station values
-            	newCellLoc.setStateInvalid();
-            }
-            else if(pSetMan != null && settings != null && settings.getLocationNetworkSetting() == PrivacySettings.RANDOM){
-            	Random values = new Random();
-            	newCellLoc.setCellLocationData(values.nextInt(), values.nextInt(), values.nextInt(), values.nextInt(), values.nextInt());
-            }
-            else{
-            	newCellLoc.setCellLocationData(baseStationId, baseStationLatitude, baseStationLongitude, systemId, networkId);
-            }
-            //-------------------------------------------------------------------------------------------------------------------------------------------------------------
+            newCellLoc.setCellLocationData(baseStationId, baseStationLatitude,
+                    baseStationLongitude, systemId, networkId);
 
             if (reasonForDenial == 0) {
                 mRegistrationDeniedReason = ServiceStateTracker.REGISTRATION_DENIED_GEN;
@@ -732,25 +694,14 @@ public class CdmaServiceStateTracker extends ServiceStateTracker {
                                 "'= " + opNames[2]);
                     }
                 }
-                //-----------------------------------------------------------------------------------------------------------------------------------------------------
+
                 if (!isSubscriptionFromRuim) {
                     // In CDMA in case on NV, the ss.mOperatorAlphaLong is set later with the
                     // ERI text, so here it is ignored what is coming from the modem.
-                	if(pSetMan != null && settings != null && settings.getNetworkInfoSetting() != PrivacySettings.REAL){
-                		newSS.setOperatorName(null, "", "");
-                	}
-                	else{
-                		newSS.setOperatorName(null, opNames[1], opNames[2]);
-                	}
+                    newSS.setOperatorName(null, opNames[1], opNames[2]);
                 } else {
-                	if(pSetMan != null && settings != null && settings.getNetworkInfoSetting() != PrivacySettings.REAL){
-                		newSS.setOperatorName("", "", "");
-                	}
-                	else{
-                		newSS.setOperatorName(opNames[0], opNames[1], opNames[2]);
-                	}
+                    newSS.setOperatorName(opNames[0], opNames[1], opNames[2]);
                 }
-                //-----------------------------------------------------------------------------------------------------------------------------------------------------
             } else {
                 if (DBG) log("EVENT_POLL_STATE_OPERATOR_CDMA: error parsing opNames");
             }
@@ -1051,30 +1002,15 @@ public class CdmaServiceStateTracker extends ServiceStateTracker {
             if ((cm.getRadioState().isOn()) && (!isSubscriptionFromRuim)) {
                 String eriText;
                 // Now the CDMAPhone sees the new ServiceState so it can get the new ERI text
-                //---------------------------------------------------------------------------------------------------------------------------------------------------------
-                PrivacySettings settings = pSetMan.getSettings(mContext.getPackageName(), 0);
-                if(pSetMan != null && settings != null && settings.getNetworkInfoSetting() != PrivacySettings.REAL){
-                	if (ss.getState() == ServiceState.STATE_IN_SERVICE) {
-                        eriText = "";
-                    } else {
-                        // Note that ServiceState.STATE_OUT_OF_SERVICE is valid used for
-                        // mRegistrationState 0,2,3 and 4
-                        eriText = phone.getContext().getText(
-                                com.android.internal.R.string.roamingTextSearching).toString();
-                    }
-                } else{
-                	//original code
-                	if (ss.getState() == ServiceState.STATE_IN_SERVICE) {
-                        eriText = phone.getCdmaEriText();
-                    } else {
-                        // Note that ServiceState.STATE_OUT_OF_SERVICE is valid used for
-                        // mRegistrationState 0,2,3 and 4
-                        eriText = phone.getContext().getText(
-                                com.android.internal.R.string.roamingTextSearching).toString();
-                    }
+                if (ss.getState() == ServiceState.STATE_IN_SERVICE) {
+                    eriText = phone.getCdmaEriText();
+                } else {
+                    // Note that ServiceState.STATE_OUT_OF_SERVICE is valid used for
+                    // mRegistrationState 0,2,3 and 4
+                    eriText = phone.getContext().getText(
+                            com.android.internal.R.string.roamingTextSearching).toString();
                 }
                 ss.setOperatorAlphaLong(eriText);
-                //---------------------------------------------------------------------------------------------------------------------------------------------------------
             }
 
             String operatorNumeric;

@@ -16,7 +16,6 @@
 
 package com.android.server;
 
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -57,7 +56,7 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
     private static final String TAG = "TelephonyRegistry";
     private static final boolean DBG = false;
 
-    public static class Record {
+    private static class Record {
         String pkgForDebug;
 
         IBinder binder;
@@ -67,29 +66,29 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
         int events;
     }
 
-    protected final Context mContext;
+    private final Context mContext;
 
     // access should be inside synchronized (mRecords) for these two fields
-    protected final ArrayList<IBinder> mRemoveList = new ArrayList<IBinder>();
-    protected final ArrayList<Record> mRecords = new ArrayList<Record>();
+    private final ArrayList<IBinder> mRemoveList = new ArrayList<IBinder>();
+    private final ArrayList<Record> mRecords = new ArrayList<Record>();
 
     private final IBatteryStats mBatteryStats;
 
-    protected int mCallState = TelephonyManager.CALL_STATE_IDLE;
+    private int mCallState = TelephonyManager.CALL_STATE_IDLE;
 
-    protected String mCallIncomingNumber = "";
+    private String mCallIncomingNumber = "";
 
-    protected ServiceState mServiceState = new ServiceState();
+    private ServiceState mServiceState = new ServiceState();
 
-    protected SignalStrength mSignalStrength = new SignalStrength();
+    private SignalStrength mSignalStrength = new SignalStrength();
 
-    protected boolean mMessageWaiting = false;
+    private boolean mMessageWaiting = false;
 
-    protected boolean mCallForwarding = false;
+    private boolean mCallForwarding = false;
 
-    protected int mDataActivity = TelephonyManager.DATA_ACTIVITY_NONE;
+    private int mDataActivity = TelephonyManager.DATA_ACTIVITY_NONE;
 
-    protected int mDataConnectionState = TelephonyManager.DATA_UNKNOWN;
+    private int mDataConnectionState = TelephonyManager.DATA_UNKNOWN;
 
     private boolean mDataConnectionPossible = false;
 
@@ -103,13 +102,13 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
 
     private LinkCapabilities mDataConnectionLinkCapabilities;
 
-    protected Bundle mCellLocation = new Bundle();
+    private Bundle mCellLocation = new Bundle();
 
-    protected int mDataConnectionNetworkType;
+    private int mDataConnectionNetworkType;
 
-    protected int mOtaspMode = ServiceStateTracker.OTASP_UNKNOWN;
+    private int mOtaspMode = ServiceStateTracker.OTASP_UNKNOWN;
 
-    protected CellInfo mCellInfo = null;
+    private CellInfo mCellInfo = null;
 
     static final int PHONE_STATE_PERMISSION_MASK =
                 PhoneStateListener.LISTEN_CALL_FORWARDING_INDICATOR |
@@ -125,7 +124,7 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
     // calls go through a oneway interface and local calls going through a
     // handler before they get to app code.
 
-    protected TelephonyRegistry(Context context) {
+    TelephonyRegistry(Context context) {
         CellLocation  location = CellLocation.getEmpty();
 
         // Note that location can be null for non-phone builds like
@@ -254,7 +253,7 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
         }
     }
 
-    protected void remove(IBinder binder) {
+    private void remove(IBinder binder) {
         synchronized (mRecords) {
             final int recordCount = mRecords.size();
             for (int i = 0; i < recordCount; i++) {
@@ -276,7 +275,6 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
             for (Record r : mRecords) {
                 if ((r.events & PhoneStateListener.LISTEN_CALL_STATE) != 0) {
                     try {
-                    	
                         r.callback.onCallStateChanged(state, incomingNumber);
                     } catch (RemoteException ex) {
                         mRemoveList.add(r.binder);
@@ -294,11 +292,9 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
         }
         synchronized (mRecords) {
             mServiceState = state;
-	    mServiceState.setOperatorName("", "", "");
             for (Record r : mRecords) {
                 if ((r.events & PhoneStateListener.LISTEN_SERVICE_STATE) != 0) {
                     try {
-			state.setOperatorName("", "", "");
                         r.callback.onServiceStateChanged(new ServiceState(state));
                     } catch (RemoteException ex) {
                         mRemoveList.add(r.binder);
@@ -576,7 +572,7 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
     // the legacy intent broadcasting
     //
 
-    protected void broadcastServiceStateChanged(ServiceState state) {
+    private void broadcastServiceStateChanged(ServiceState state) {
         long ident = Binder.clearCallingIdentity();
         try {
             mBatteryStats.notePhoneState(state.getState());
@@ -672,7 +668,7 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
         mContext.sendStickyBroadcast(intent);
     }
 
-    protected boolean checkNotifyPermission(String method) {
+    private boolean checkNotifyPermission(String method) {
         if (mContext.checkCallingOrSelfPermission(android.Manifest.permission.MODIFY_PHONE_STATE)
                 == PackageManager.PERMISSION_GRANTED) {
             return true;
@@ -683,7 +679,7 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
         return false;
     }
 
-    protected void checkListenerPermission(int events) {
+    private void checkListenerPermission(int events) {
         if ((events & PhoneStateListener.LISTEN_CELL_LOCATION) != 0) {
             mContext.enforceCallingOrSelfPermission(
                     android.Manifest.permission.ACCESS_COARSE_LOCATION, null);
@@ -702,7 +698,7 @@ class TelephonyRegistry extends ITelephonyRegistry.Stub {
         }
     }
 
-    protected void handleRemoveListLocked() {
+    private void handleRemoveListLocked() {
         if (mRemoveList.size() > 0) {
             for (IBinder b: mRemoveList) {
                 remove(b);

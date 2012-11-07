@@ -3127,6 +3127,30 @@ public final class Settings {
 
 
         /**
+         * Sets bg color of optimus lockscreen bg
+         * @hide
+         */
+	public static final String CIRCLES_LOCK_BG_COLOR = "circles_lock_bg_color";
+
+        /**
+         * Sets ring color of optimus lockscreen
+         * @hide
+         */
+        public static final String CIRCLES_LOCK_RING_COLOR = "circles_lock_ring_color";
+
+        /**
+         * Sets halo color of optimus lockscreen
+         * @hide
+         */
+        public static final String CIRCLES_LOCK_HALO_COLOR = "circles_lock_halo_color";
+
+        /**
+         * Sets wave color of optimus lockscreen
+         * @hide
+         */
+        public static final String CIRCLES_LOCK_WAVE_COLOR = "circles_lock_wave_color";
+
+        /**
          * Settings to backup. This is here so that it's in the same place as the settings
          * keys and easy to update.
          *

@@ -25,6 +25,7 @@ import com.android.internal.widget.LockPatternUtils;
 import com.android.internal.widget.RotarySelector;
 import com.android.internal.widget.SlidingTab;
 import com.android.internal.widget.WaveView;
+import com.android.internal.widget.multiwaveview.CirclesView;
 import com.android.internal.widget.multiwaveview.GlowPadView;
 import com.android.internal.widget.multiwaveview.MultiWaveView;
 
@@ -119,6 +120,7 @@ class LockScreen extends LinearLayout implements KeyguardScreen {
     private boolean mSearchDisabled;
     // Is there a vibrator
     private final boolean mHasVibrator;
+    private boolean mAltTimeout;
 
     private TextView mCarrier;
     private View mUnlockWidget;
@@ -132,12 +134,14 @@ class LockScreen extends LinearLayout implements KeyguardScreen {
     private static final int LOCK_STYLE_GB = 2;
     private static final int LOCK_STYLE_ECLAIR = 3;
     private static final int LOCK_STYLE_BB = 4;
+    private static final int LOCK_STYLE_OP4 = 5;
     
     private boolean mUseJbLockscreen = (mLockscreenStyle == LOCK_STYLE_JB);
     private boolean mUseIcsLockscreen = (mLockscreenStyle == LOCK_STYLE_ICS);
     private boolean mUseGbLockscreen = (mLockscreenStyle == LOCK_STYLE_GB);
     private boolean mUseEclairLockscreen = (mLockscreenStyle == LOCK_STYLE_ECLAIR);
     private boolean mUseBbLockscreen = (mLockscreenStyle == LOCK_STYLE_BB);
+    private boolean mUseOp4Lockscreen = (mLockscreenStyle == LOCK_STYLE_OP4);
 
     private DigitalClock mDigitalClock;
 
@@ -457,6 +461,52 @@ class LockScreen extends LinearLayout implements KeyguardScreen {
         public void onFinishFinalAnimation() { }
     }
 
+    class CirclesViewMethods implements CirclesView.OnTriggerListener, UnlockWidgetCommonMethods {
+
+        private final CirclesView mCirclesView;
+
+        CirclesViewMethods(CirclesView circlesView) {
+            mCirclesView = circlesView;
+        }
+        /** {@inheritDoc} */
+        public void onTrigger(View v, int whichHandle) {
+            if (whichHandle == CirclesView.OnTriggerListener.CENTER_HANDLE) {
+                requestUnlockScreen();
+            }
+        }
+
+        /** {@inheritDoc} */
+        public void onGrabbedStateChange(View v, int grabbedState) {
+            // Don't poke the wake lock when returning to a state where the handle is
+            // not grabbed since that can happen when the system (instead of the user)
+            // cancels the grab.
+            if (grabbedState == CirclesView.OnTriggerListener.CENTER_HANDLE) {
+                mCallback.pokeWakelock(STAY_ON_WHILE_GRABBED_TIMEOUT);
+            }
+        }
+
+        public void updateResources() {
+        }
+
+        public View getView() {
+            return mCirclesView;
+        }
+        public void reset(boolean animate) {
+            mCirclesView.reset();
+        }
+        public void ping() {
+        }
+        public void setEnabled(int resourceId, boolean enabled) {
+            // Not used
+        }
+        public int getTargetPosition(int resourceId) {
+            return -1; // Not supported
+        }
+        public void cleanUp() {
+            mCirclesView.setOnTriggerListener(null);
+        }
+    }
+
     class GlowPadViewMethods implements GlowPadView.OnTriggerListener,
             UnlockWidgetCommonMethods {
         private final GlowPadView mGlowPadView;
@@ -739,12 +789,18 @@ class LockScreen extends LinearLayout implements KeyguardScreen {
     }
 
     private void requestUnlockScreen() {
+	if(mUseBbLockscreen || mUseOp4Lockscreen) {
+	mAltTimeout = true;
+	}  else {
+	mAltTimeout = false;
+	}
+
         // Delay hiding lock screen long enough for animation to finish
         postDelayed(new Runnable() {
             public void run() {
                 mCallback.goToUnlockScreen();
             }
-        }, mUseBbLockscreen ? WAIT_FOR_ANIMATION_TIMEOUT_ALT
+        }, mAltTimeout ? WAIT_FOR_ANIMATION_TIMEOUT_ALT
                 : WAIT_FOR_ANIMATION_TIMEOUT);
     }
 
@@ -817,6 +873,8 @@ class LockScreen extends LinearLayout implements KeyguardScreen {
             inflater.inflate(R.layout.keyguard_screen_tab_unlock_eclair, this, true);
 	    } else if (mUseBbLockscreen) {
             inflater.inflate(R.layout.keyguard_screen_tab_unlock_bb, this, true);
+	    } else if (mUseOp4Lockscreen) {
+            inflater.inflate(R.layout.keyguard_screen_tab_unlock_op4, this, true);
 	    } else {
             inflater.inflate(R.layout.keyguard_screen_tab_unlock_jb, this, true);
 	    }
@@ -833,7 +891,7 @@ class LockScreen extends LinearLayout implements KeyguardScreen {
             inflater.inflate(R.layout.keyguard_screen_tab_unlock_jb, this, true);
 	    }
         }
-	if (!mUseBbLockscreen) {
+	if (!mUseBbLockscreen && !mUseOp4Lockscreen) {
         setBackground(mContext, (ViewGroup) findViewById(R.id.root));
 	}
 
@@ -886,6 +944,11 @@ class LockScreen extends LinearLayout implements KeyguardScreen {
             MultiWaveViewMethods multiWaveViewMethods = new MultiWaveViewMethods(multiWaveView);
             multiWaveView.setOnTriggerListener(multiWaveViewMethods);
             return multiWaveViewMethods;
+        } else if (unlockWidget instanceof CirclesView) {
+            CirclesView circlesView = (CirclesView) unlockWidget;
+            CirclesViewMethods circlesViewMethods = new CirclesViewMethods(circlesView);
+            circlesView.setOnTriggerListener(circlesViewMethods);
+            return circlesViewMethods;
         } else if (unlockWidget instanceof GlowPadView) {
             GlowPadView glowPadView = (GlowPadView) unlockWidget;
             GlowPadViewMethods glowPadViewMethods = new GlowPadViewMethods(glowPadView);

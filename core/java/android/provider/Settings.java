@@ -2514,6 +2514,11 @@ public final class Settings {
          */
         public static final String EXPANDED_VIEW_WIDGET = "expanded_view_widget";
 
+         /**
+          * @hide
+          */
+        public static final String PHONE_STATUS_BAR_BRIGHTNESS = "phone_status_bar_brightness";
+
         /**
          * Whether to hide the notification screen after clicking on a widget
          * button

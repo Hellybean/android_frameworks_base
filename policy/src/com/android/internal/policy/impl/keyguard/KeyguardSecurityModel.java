@@ -38,6 +38,7 @@ public class KeyguardSecurityModel {
         None, // No security enabled
         Pattern, // Unlock by drawing a pattern.
         Password, // Unlock by entering an alphanumeric password
+        Gesture, // Unlock by drawing a gesture.
         PIN, // Strictly numeric password
         Biometric, // Unlock with a biometric key (e.g. finger print or face unlock)
         Account, // Unlock by entering an account's login and password.
@@ -129,6 +130,12 @@ public class KeyguardSecurityModel {
                             SecurityMode.Account : SecurityMode.Pattern;
                     }
                     break;
+                case DevicePolicyManager.PASSWORD_QUALITY_GESTURE_WEAK:
+                    if (mLockPatternUtils.isLockGestureEnabled()) {
+                        mode = mLockPatternUtils.isPermanentlyLocked() ?
+                            SecurityMode.Account : SecurityMode.Gesture;
+                    }
+                    break;
 
                 default:
                     throw new IllegalStateException("Unknown unlock mode:" + security);
@@ -149,7 +156,8 @@ public class KeyguardSecurityModel {
         if (isBiometricUnlockEnabled() && !isBiometricUnlockSuppressed()
                 && (mode == SecurityMode.Password
                         || mode == SecurityMode.PIN
-                        || mode == SecurityMode.Pattern)) {
+                        || mode == SecurityMode.Pattern
+                        || mode == SecurityMode.Gesture )) {
             return SecurityMode.Biometric;
         }
         return mode; // no alternate, return what was given
@@ -166,6 +174,7 @@ public class KeyguardSecurityModel {
             case Biometric:
                 return getSecurityMode();
             case Pattern:
+            case Gesture:
                 return SecurityMode.Account;
         }
         return mode; // no backup, return current security mode

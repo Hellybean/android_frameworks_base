@@ -1053,6 +1053,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     }
 
     private void triggerVirtualKeypress(final int keyCode) {
+        new Thread(new Runnable() {
+            public void run() {
         InputManager im = InputManager.getInstance();
         long now = SystemClock.uptimeMillis();
 
@@ -1062,14 +1064,16 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         final KeyEvent upEvent = KeyEvent.changeAction(downEvent, KeyEvent.ACTION_UP);
 
 	mIsVirtualKeypress = true;
-        im.injectInputEvent(downEvent, InputManager.INJECT_INPUT_EVENT_MODE_ASYNC);
+                im.injectInputEvent(downEvent, InputManager.INJECT_INPUT_EVENT_MODE_WAIT_FOR_RESULT);
                 if (keyCode == KeyEvent.KEYCODE_CAMERA) {
                     KeyEvent repeatEvent = KeyEvent.changeTimeRepeat(downEvent,
                             SystemClock.uptimeMillis(), 1, downEvent.getFlags() | KeyEvent.FLAG_LONG_PRESS);
-                    im.injectInputEvent(repeatEvent, InputManager.INJECT_INPUT_EVENT_MODE_ASYNC);
+                    im.injectInputEvent(repeatEvent, InputManager.INJECT_INPUT_EVENT_MODE_WAIT_FOR_RESULT);
                 }
-        im.injectInputEvent(upEvent, InputManager.INJECT_INPUT_EVENT_MODE_ASYNC);
+                im.injectInputEvent(upEvent, InputManager.INJECT_INPUT_EVENT_MODE_WAIT_FOR_RESULT);
 	mIsVirtualKeypress = false;
+    }
+        }).start();
     }
 
     private void performKeyAction(String strBehavior) {
@@ -2687,17 +2691,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             }
         }
 
-        // Specific device key handling
-        if (mGlobalKeyManager != null) {
-            try {
-                // The device only should consume known keys.
-                if (mGlobalKeyManager.handleGlobalKey(mContext, keyCode, event)) {
-                    return -1;
-                }
-            } catch (Exception e) {
-                Slog.w(TAG, "Could not dispatch event to device key handler", e);
-            }
-        }
 
         // First we always handle the home key here, so applications
         // can never break it, although if keyguard is on, we do let
@@ -2862,6 +2855,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                         }
                     }
                 }
+                if (canceled)
+                    return -1;
             }
         } else if (keyCode == KeyEvent.KEYCODE_SEARCH) {
             if (down) {
@@ -2974,6 +2969,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
                     return -1;
                 }
             } else {
+                if (mRecentAppsPreloaded && !mPressOnCameraBehavior.equals(KEY_ACTION_APP_SWITCH) &&
+                        !mLongPressOnBackBehavior.equals(KEY_ACTION_APP_SWITCH)) {
+                    cancelPreloadRecentApps();
+                }
                 if (mCameraLongPressed) {
                     mCameraLongPressed = false;
                     return -1;
@@ -3149,8 +3148,16 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             return -1;
         }
 
-        if (mGlobalKeyManager.handleGlobalKey(mContext, keyCode, event)) {
-            return -1;
+        // Specific device key handling
+        if (mGlobalKeyManager != null) {
+            try {
+                // The device only should consume known keys.
+				if (mGlobalKeyManager.handleGlobalKey(mContext, keyCode, event)) {
+					return -1;
+				}
+            } catch (Exception e) {
+                Slog.w(TAG, "Could not dispatch event to device key handler", e);
+            }
         }
 
         // Let the application handle the key.
@@ -6123,19 +6130,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     }
 
     @Override
-
-
-
-
-
-
-
-
-
-
-
-
-
     public void setCurrentUserLw(int newUserId) {
         if (mKeyguardMediator != null) {
             mKeyguardMediator.setCurrentUser(newUserId);

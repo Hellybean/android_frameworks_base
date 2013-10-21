@@ -195,7 +195,15 @@ public class Clock extends TextView {
                     AmPm = (new SimpleDateFormat(" a")).format(mCalendar.getTime());
                 }
                 if (mAmPmStyle == AM_PM_STYLE_GONE) {
+		try
+    		{
                     formatted.delete(result.indexOf(AmPm), result.lastIndexOf(AmPm)+AmPm.length());
+    		} catch (IndexOutOfBoundsException ex )
+    		{
+      		System.out.println("This is your problem: " + ex.getMessage()
+          	+ "\nHere is where it happened:\n");
+      		ex.printStackTrace();
+    		}
                 } else {
                     if (mAmPmStyle == AM_PM_STYLE_SMALL) {
                         CharacterStyle style = new RelativeSizeSpan(0.7f);

@@ -189,21 +189,17 @@ public class Clock extends TextView {
         if (!is24) {
             if (mAmPmStyle != AM_PM_STYLE_NORMAL) {
                 String AmPm;
-                if (format.indexOf("a")==0) {
-                    AmPm = (new SimpleDateFormat("a ")).format(mCalendar.getTime());
+                if (format.indexOf("a") == 0) {
+                    if (format.indexOf("a ") == 0) {
+                        AmPm = (new SimpleDateFormat("a ")).format(mCalendar.getTime());
+                    } else {
+                        AmPm = (new SimpleDateFormat("a")).format(mCalendar.getTime());
+                    }
                 } else {
                     AmPm = (new SimpleDateFormat(" a")).format(mCalendar.getTime());
                 }
                 if (mAmPmStyle == AM_PM_STYLE_GONE) {
-		try
-    		{
                     formatted.delete(result.indexOf(AmPm), result.lastIndexOf(AmPm)+AmPm.length());
-    		} catch (IndexOutOfBoundsException ex )
-    		{
-      		System.out.println("This is your problem: " + ex.getMessage()
-          	+ "\nHere is where it happened:\n");
-      		ex.printStackTrace();
-    		}
                 } else {
                     if (mAmPmStyle == AM_PM_STYLE_SMALL) {
                         CharacterStyle style = new RelativeSizeSpan(0.7f);

@@ -97,6 +97,7 @@ public class InputManagerService extends IInputManager.Stub
         implements Watchdog.Monitor, DisplayManagerService.InputManagerFuncs {
     static final String TAG = "InputManager";
     static final boolean DEBUG = false;
+    static final boolean DEBUG_FILTER = false;
 
     private static final String EXCLUDED_DEVICES_PATH = "etc/excluded-input-devices.xml";
 
@@ -143,8 +144,9 @@ public class InputManagerService extends IInputManager.Stub
 
     // State for the currently installed input filter.
     final Object mInputFilterLock = new Object();
-    IInputFilter mInputFilter; // guarded by mInputFilterLock
-    InputFilterHost mInputFilterHost; // guarded by mInputFilterLock
+    ChainedInputFilterHost mInputFilterHost; // guarded by mInputFilterLock
+    ArrayList<ChainedInputFilterHost> mInputFilterChain =
+            new ArrayList<ChainedInputFilterHost>(); // guarded by mInputFilterLock
 
     private static native int nativeInit(InputManagerService service,
             Context context, MessageQueue messageQueue);
@@ -478,33 +480,27 @@ public class InputManagerService extends IInputManager.Stub
      */
     public void setInputFilter(IInputFilter filter) {
         synchronized (mInputFilterLock) {
-            final IInputFilter oldFilter = mInputFilter;
+            final IInputFilter oldFilter = mInputFilterHost != null
+                    ? mInputFilterHost.mInputFilter : null;
             if (oldFilter == filter) {
                 return; // nothing to do
             }
 
             if (oldFilter != null) {
-                mInputFilter = null;
                 mInputFilterHost.disconnectLocked();
+                mInputFilterChain.remove(mInputFilterHost);
                 mInputFilterHost = null;
-                try {
-                    oldFilter.uninstall();
-                } catch (RemoteException re) {
-                    /* ignore */
-                }
             }
 
             if (filter != null) {
-                mInputFilter = filter;
-                mInputFilterHost = new InputFilterHost();
-                try {
-                    filter.install(mInputFilterHost);
-                } catch (RemoteException re) {
-                    /* ignore */
-                }
+                ChainedInputFilterHost head = mInputFilterChain.isEmpty() ? null :
+                    mInputFilterChain.get(0);
+                mInputFilterHost = new ChainedInputFilterHost(filter, head);
+                mInputFilterHost.connectLocked();
+                mInputFilterChain.add(0, mInputFilterHost);
             }
 
-            nativeSetInputFilterEnabled(mPtr, filter != null);
+            nativeSetInputFilterEnabled(mPtr, !mInputFilterChain.isEmpty());
         }
     }
 
@@ -1396,15 +1392,22 @@ public class InputManagerService extends IInputManager.Stub
 
     // Native callback.
     final boolean filterInputEvent(InputEvent event, int policyFlags) {
+        ChainedInputFilterHost head = null;
         synchronized (mInputFilterLock) {
-            if (mInputFilter != null) {
-                try {
-                    mInputFilter.filterInputEvent(event, policyFlags);
-                } catch (RemoteException e) {
-                    /* ignore */
-                }
-                return false;
+            if (!mInputFilterChain.isEmpty()) {
+                head = mInputFilterChain.get(0);
             }
+        }
+        // call filter input event outside of the lock.
+        // this is safe, because we know that mInputFilter never changes.
+        // we may loose a event, but this does not differ from the original implementation.
+        if (head != null) {
+            try {
+                head.mInputFilter.filterInputEvent(event, policyFlags);
+            } catch (RemoteException e) {
+                /* ignore */
+            }
+            return false;
         }
         event.recycle();
         return true;
@@ -1630,10 +1633,32 @@ public class InputManagerService extends IInputManager.Stub
     /**
      * Hosting interface for input filters to call back into the input manager.
      */
-    private final class InputFilterHost extends IInputFilterHost.Stub {
+    private final class ChainedInputFilterHost extends IInputFilterHost.Stub {
+        private final IInputFilter mInputFilter;
+        private ChainedInputFilterHost mNext;
         private boolean mDisconnected;
 
+        private ChainedInputFilterHost(IInputFilter filter, ChainedInputFilterHost next) {
+            mInputFilter = filter;
+            mNext = next;
+            mDisconnected = false;
+        }
+
+        public void connectLocked() {
+            try {
+                mInputFilter.install(this);
+            } catch (RemoteException re) {
+                /* ignore */
+            }
+        }
+
         public void disconnectLocked() {
+            try {
+                mInputFilter.uninstall();
+            } catch (RemoteException re) {
+                /* ignore */
+            }
+            // DO NOT set mInputFilter to null here! mInputFilter is used outside of the lock!
             mDisconnected = true;
         }
 
@@ -1645,9 +1670,21 @@ public class InputManagerService extends IInputManager.Stub
 
             synchronized (mInputFilterLock) {
                 if (!mDisconnected) {
-                    nativeInjectInputEvent(mPtr, event, 0, 0,
-                            InputManager.INJECT_INPUT_EVENT_MODE_ASYNC, 0,
-                            policyFlags | WindowManagerPolicy.FLAG_FILTERED);
+                    if (mNext == null) {
+                        nativeInjectInputEvent(mPtr, event, 0, 0,
+                                InputManager.INJECT_INPUT_EVENT_MODE_ASYNC, 0,
+                                policyFlags | WindowManagerPolicy.FLAG_FILTERED);
+                    } else {
+                        try {
+                            // We need to pass a copy into filterInputEvent as it assumes
+                            // the callee takes responsibility and recycles it - in case
+                            // multiple filters are chained, calling into the second filter
+                            // will cause event to be recycled twice
+                            mNext.mInputFilter.filterInputEvent(event.copy(), policyFlags);
+                        } catch (RemoteException e) {
+                            /* ignore */
+                        }
+                    }
                 }
             }
         }

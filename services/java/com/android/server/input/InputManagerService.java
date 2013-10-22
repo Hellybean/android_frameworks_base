@@ -508,6 +508,55 @@ public class InputManagerService extends IInputManager.Stub
         }
     }
 
+    /**
+     * Registers a secondary input filter. These filters are always behind the "original"
+     * input filter. This ensures that all input events will be filtered by the
+     * {@code AccessibilityManagerService} first.
+     * <p>
+     * <b>Note:</b> Even though this implementation using AIDL interfaces, it is designed to only
+     * provide direct access. Therefore, any filter registering should reside in the
+     * system server DVM only!
+     *
+     * @param filter The input filter to register.
+     */
+    public void registerSecondaryInputFilter(IInputFilter filter) {
+        synchronized (mInputFilterLock) {
+            ChainedInputFilterHost host = new ChainedInputFilterHost(filter, null);
+            if (!mInputFilterChain.isEmpty()) {
+                mInputFilterChain.get(mInputFilterChain.size() - 1).mNext = host;
+            }
+            host.connectLocked();
+            mInputFilterChain.add(host);
+
+            nativeSetInputFilterEnabled(mPtr, !mInputFilterChain.isEmpty());
+        }
+    }
+
+    public void unregisterSecondaryInputFilter(IInputFilter filter) {
+        synchronized (mInputFilterLock) {
+            int index = findInputFilterIndexLocked(filter);
+            if (index >= 0) {
+                ChainedInputFilterHost host = mInputFilterChain.get(index);
+                host.disconnectLocked();
+                if (index >= 1) {
+                    mInputFilterChain.get(index - 1).mNext = host.mNext;
+                }
+                mInputFilterChain.remove(index);
+            }
+
+            nativeSetInputFilterEnabled(mPtr, !mInputFilterChain.isEmpty());
+        }
+    }
+
+    private int findInputFilterIndexLocked(IInputFilter filter) {
+        for (int i = 0; i < mInputFilterChain.size(); i++) {
+            if (mInputFilterChain.get(i).mInputFilter == filter) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     @Override // Binder call
     public boolean injectInputEvent(InputEvent event, int mode) {
         if (event == null) {

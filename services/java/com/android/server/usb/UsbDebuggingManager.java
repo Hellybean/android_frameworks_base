@@ -101,8 +101,8 @@ public class UsbDebuggingManager implements Runnable {
                 }
             }
         } catch (IOException ex) {
-            Slog.e(TAG, "Communication error: ", ex);
-            throw ex;
+           // Slog.e(TAG, "Communication error: ", ex);
+           // throw ex;
         } finally {
             closeSocket();
         }

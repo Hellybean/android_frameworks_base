@@ -229,4 +229,8 @@
 
     <!-- Padding under status bar battery icon -->
     <dimen name="status_bar_battery_bottom_padding">1px</dimen>
+
+    <!-- Network stats text size -->
+    <dimen name="network_stats_text_size">9dp</dimen>
+
 </resources>

@@ -2940,6 +2940,24 @@ public final class Settings {
         */
         public static final String COMBINED_BAR_AUTO_HIDE = "combined_bar_auto_hide";
 
+	    /**
+         * Whether to show the network status in the status bar
+         * @hide
+         */
+        public static final String STATUS_BAR_NETWORK_STATS = "status_bar_network_stats";
+ 
+        /**
+         * Frequency at which stats are updated, in milliseconds
+         * @hide
+         */
+        public static final String STATUS_BAR_NETWORK_STATS_UPDATE_INTERVAL = "status_bar_network_stats_update_frequency";
+
+        /**
+         * Network stats hide if there's no traffic
+         * @hide
+         */
+        public static final String STATUS_BAR_NETWORK_HIDE = "status_bar_network_hide";
+
         /**
          * Display style of AM/PM next to clock in status bar
          * 0: Normal display (Eclair stock)

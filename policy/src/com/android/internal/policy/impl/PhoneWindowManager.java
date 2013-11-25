@@ -520,7 +520,6 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     private boolean mScreenRecordChordEnabled = true;
     private boolean mVolumeDownKeyTriggered;
     private long mVolumeDownKeyTime;
-    private long mVolumeUpKeyTime;
     private boolean mVolumeDownKeyConsumedByChord;
     private boolean mVolumeUpKeyConsumedByChord;
     private boolean mVolumeUpKeyConsumedByScreenRecordChord;

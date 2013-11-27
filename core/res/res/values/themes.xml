@@ -913,9 +913,9 @@ please see themes_device_defaults.xml.
 
         <item name="colorPressedHighlight">@color/holo_gray_light</item>
         <item name="colorLongPressedHighlight">@color/holo_gray_bright</item>
-        <item name="colorFocusedHighlight">@color/holo_blue_dark</item>
+        <item name="colorFocusedHighlight">@color/holo_red_dark</item>
         <item name="colorMultiSelectHighlight">@color/holo_green_light</item>
-        <item name="colorActivatedHighlight">@color/holo_blue_dark</item>
+        <item name="colorActivatedHighlight">@color/holo_red_dark</item>
 
         <!-- Text styles -->
         <item name="textAppearance">@android:style/TextAppearance.Holo</item>
@@ -938,8 +938,8 @@ please see themes_device_defaults.xml.
         <item name="textColorSearchUrl">@android:color/search_url_text_holo</item>
         <item name="textColorHighlight">@android:color/highlighted_text_holo_dark</item>
         <item name="textColorHighlightInverse">@android:color/highlighted_text_holo_light</item>
-        <item name="textColorLink">@android:color/holo_blue_light</item>
-        <item name="textColorLinkInverse">@android:color/holo_blue_light</item>
+        <item name="textColorLink">@android:color/holo_red_light</item>
+        <item name="textColorLinkInverse">@android:color/holo_red_light</item>
         <item name="textColorAlertDialogListItem">@android:color/primary_text_holo_dark</item>
 
         <item name="textAppearanceLarge">@android:style/TextAppearance.Holo.Large</item>
@@ -1228,9 +1228,9 @@ please see themes_device_defaults.xml.
 
         <item name="colorPressedHighlight">@color/holo_gray_light</item>
         <item name="colorLongPressedHighlight">@color/holo_gray_bright</item>
-        <item name="colorFocusedHighlight">@color/holo_blue_dark</item>
+        <item name="colorFocusedHighlight">@color/holo_red_dark</item>
         <item name="colorMultiSelectHighlight">@color/holo_green_light</item>
-        <item name="colorActivatedHighlight">@color/holo_blue_dark</item>
+        <item name="colorActivatedHighlight">@color/holo_red_dark</item>
 
         <!-- Text styles -->
         <item name="textAppearance">@android:style/TextAppearance.Holo.Light</item>
@@ -1253,8 +1253,8 @@ please see themes_device_defaults.xml.
         <item name="textColorSearchUrl">@android:color/search_url_text_holo</item>
         <item name="textColorHighlight">@android:color/highlighted_text_holo_light</item>
         <item name="textColorHighlightInverse">@android:color/highlighted_text_holo_dark</item>
-        <item name="textColorLink">@android:color/holo_blue_light</item>
-        <item name="textColorLinkInverse">@android:color/holo_blue_light</item>
+        <item name="textColorLink">@android:color/holo_red_light</item>
+        <item name="textColorLinkInverse">@android:color/holo_red_light</item>
         <item name="textColorAlertDialogListItem">@android:color/primary_text_holo_light</item>
 
         <item name="textAppearanceLarge">@android:style/TextAppearance.Holo.Light.Large</item>

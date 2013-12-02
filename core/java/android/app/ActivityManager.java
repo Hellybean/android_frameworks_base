@@ -458,6 +458,18 @@ public class ActivityManager {
         return "true".equals(SystemProperties.get("ro.config.low_ram", "false"));
     }
 
+    /** @hide */
+    public static boolean forceHighEndGfx() {
+        return "1".equals(SystemProperties.get("persist.sys.highendgfx", deviceIsHighEndGfx() ?
+                "1" : "0"));
+    }
+
+    /** @hide */
+    public static boolean deviceIsHighEndGfx() {
+        return !isLowRamDeviceStatic() &&
+                !Resources.getSystem().getBoolean(com.android.internal.R.bool.config_avoidGfxAccel);
+    }
+
     /**
      * Used by persistent processes to determine if they are running on a
      * higher-end device so should be okay using hardware drawing acceleration
@@ -465,10 +477,7 @@ public class ActivityManager {
      * @hide
      */
     static public boolean isHighEndGfx() {
-        if (NOPE) {
-			return false;
-        }
-        return true;
+        return forceHighEndGfx();
     }
 
     /**

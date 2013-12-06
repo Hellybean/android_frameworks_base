@@ -554,7 +554,7 @@ public class TextView extends View implements ViewTreeObserver.OnPreDrawListener
 
     // It is possible to have a selection even when mEditor is null (programmatically set, like when
     // a link is pressed). These highlight-related fields do not go in mEditor.
-    int mHighlightColor = 0x6633B5E5;
+    int mHighlightColor = 0x66ED1212;
     private Path mHighlightPath;
     private final Paint mHighlightPaint;
     private boolean mHighlightPathBogus = true;

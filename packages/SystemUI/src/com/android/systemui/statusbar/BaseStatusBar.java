@@ -191,6 +191,13 @@ public abstract class BaseStatusBar extends SystemUI implements
         }
     };
 
+    private ContentObserver mShowNavObserver = new ContentObserver(mHandler) {
+        @Override
+        public void onChange(boolean selfChange) {
+            android.os.Process.killProcess(android.os.Process.myPid());
+        }
+    };
+
     private class SettingsObserver extends ContentObserver {
         public SettingsObserver(Handler handler) {
             super(handler);
@@ -285,6 +292,10 @@ public abstract class BaseStatusBar extends SystemUI implements
         mContext.getContentResolver().registerContentObserver(
                 Settings.Global.getUriFor(Settings.Global.DEVICE_PROVISIONED), true,
                 mProvisioningObserver);
+
+        mContext.getContentResolver().registerContentObserver(
+                Settings.System.getUriFor(Settings.System.SHOW_NAVIGATION), true,
+                mShowNavObserver, UserHandle.USER_ALL);
 
         mSettingsObserver.observe();
 

@@ -3520,6 +3520,16 @@ public final class Settings {
         public static final String RECENTS_PANEL_COLOR = "recents_panel_color";
 
         /**
+         * @hide
+         */
+        public static final String NOTIFICATION_PANEL_COLOR = "notification_panel_color";
+
+        /**
+         * @hide
+         */
+        public static final String SETTINGS_TILE_COLOR = "settings_tile_color";
+
+        /**
          * Settings to backup. This is here so that it's in the same place as the settings
          * keys and easy to update.
          *

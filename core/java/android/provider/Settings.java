@@ -3002,12 +3002,6 @@ public final class Settings {
         public static final String STATUS_BAR_BRIGHTNESS_CONTROL = "status_bar_brightness_control";
 
         /**
-         * Whether to show the IME switcher in the status bar
-         * @hide
-         */
-        public static final String STATUS_BAR_IME_SWITCHER = "status_bar_ime_switcher";
-
-        /**
          * Whether to collapse the notification area after dismissing the last notification
          * @hide
          */
@@ -3278,15 +3272,6 @@ public final class Settings {
           * @hide
           */
          public static final String SWAP_VOLUME_KEYS_ON_ROTATION = "swap_volume_keys_on_rotation";
-
-         /**
-          * Volume keys control cursor in text fields (default is 0)
-          * 0 - Disabled
-          * 1 - Volume up/down moves cursor left/right
-          * 2 - Volume up/down moves cursor right/left
-          * @hide
-          */
-         public static final String VOLUME_KEY_CURSOR_CONTROL = "volume_key_cursor_control";
 
         /**
          * toggle to "fix" the following: (found in NotificationManagerService)

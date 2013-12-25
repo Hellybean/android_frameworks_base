@@ -801,7 +801,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode {
 	// Set notification background
         setNotificationWallpaperHelper();
 
-
         // Quick Settings (where available, some restrictions apply)
         if (mHasSettingsPanel) {
             // first, figure out where quick settings should be inflated
@@ -863,13 +862,13 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode {
                 }
                 mQS.setService(this);
                 mQS.setBar(mStatusBarView);
-                mQS.setupQuickSettings();
+                mQS.setup(mNetworkController, mBluetoothController, mBatteryController,
+                        mLocationController, mRotationLockController);
 
-                // Start observing for changes
-                if (mTilesChangedObserver == null) {
-                    mTilesChangedObserver = new TilesChangedObserver(mHandler);
-                    mTilesChangedObserver.startObserving();
-                }
+		// Start observing for changes
+                mTilesChangedObserver = new TilesChangedObserver(mHandler);
+                mTilesChangedObserver.startObserving();		
+
             } else {
                 mQS = null; // fly away, be free
             }
@@ -3344,6 +3343,41 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode {
         }
     }
 
+    /**
+     * For now this class is for Notification drawer custom background 
+     * and notification rows transparency 
+     */
+    private class TilesChangedObserver extends ContentObserver {
+        public TilesChangedObserver(Handler handler) {
+            super(handler);
+        }
+
+        @Override
+        public void onChange(boolean selfChange) {
+            onChange(selfChange, null);
+
+            setNotificationWallpaperHelper();
+            setNotificationAlphaHelper();
+        }
+
+        @Override
+        public void onChange(boolean selfChange, Uri uri) {
+
+            setNotificationWallpaperHelper();
+            setNotificationAlphaHelper();
+	}
+
+        public void startObserving() {
+            final ContentResolver cr = mContext.getContentResolver();
+            cr.registerContentObserver(
+                    Settings.System.getUriFor(Settings.System.NOTIF_WALLPAPER_ALPHA),
+                    false, this, UserHandle.USER_ALL);
+                    setNotificationWallpaperHelper();
+            cr.registerContentObserver(
+                    Settings.System.getUriFor(Settings.System.NOTIF_ALPHA),
+                    false, this, UserHandle.USER_ALL);
+        }
+    }
 
     private void setNotificationWallpaperHelper() {
         float wallpaperAlpha = Settings.System.getFloat(mContext.getContentResolver(), Settings.System.NOTIF_WALLPAPER_ALPHA, 0.1f);
@@ -3490,7 +3524,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode {
                     inflateRibbon();
                     mRibbonView.setVisibility(View.VISIBLE);
                 }
-            } else if (uri != null && uri.equals(Settings.System.getUriFor(
+            }  else if (uri != null && uri.equals(Settings.System.getUriFor(
                     Settings.System.QUICK_SETTINGS_RIBBON_TILES))) {
                     cleanupRibbon();
                     inflateRibbon();

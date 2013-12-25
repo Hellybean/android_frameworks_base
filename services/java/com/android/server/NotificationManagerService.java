@@ -823,13 +823,6 @@ public class NotificationManagerService extends INotificationManager.Stub
             final ComponentName component, final int userid) {
 	// Halo
 	if (!component.getPackageName().equals("HaloComponent")) checkCallerIsSystem();        
-	// Active display	
-	final int permission = mContext.checkCallingPermission(
-                android.Manifest.permission.SYSTEM_NOTIFICATION_LISTENER);
-        if (permission == PackageManager.PERMISSION_DENIED) {
-            checkCallerIsSystem();
-	}
-        
         synchronized (mNotificationList) {
             try {
                 NotificationListenerInfo info

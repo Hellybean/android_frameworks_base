@@ -1461,7 +1461,4 @@
          performance profiles  -->
     <string name="config_perf_profile_default_entry" translatable="false"></string>
 
-    <!-- Workaround for devices with broken keyboards -->
-    <bool name="config_forceDisableHardwareKeyboard">false</bool>
-
 </resources>

@@ -1487,10 +1487,10 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode {
             resolver, Settings.System.STATUSBAR_CLOCK_STYLE, 0,
             UserHandle.USER_CURRENT);
         if (clockLocation == 0 && clock != null) {
-            clock.setVisibility(show ? (showClock ? View.VISIBLE : View.GONE) : View.GONE);
+            clock.setVisibility(showClock ? (showClock ? View.VISIBLE : View.GONE) : View.GONE);
         }
         if (clockLocation == 1 && cclock != null) {
-            cclock.setVisibility(show ? (showClock ? View.VISIBLE : View.GONE) : View.GONE);
+            cclock.setVisibility(showClock ? (showClock ? View.VISIBLE : View.GONE) : View.GONE);
         }
     }
 

@@ -39,4 +39,8 @@
     <color name="batterymeter_low">#FFFF3300</color>
     <color name="batterymeter_full">#FFFFFFFF</color>
     <color name="status_bar_clock_color">#FFFFFFFF</color>
+    <color name="status_bar_traffic_color">#FFFFFFFF</color>
+
+    <!-- app sidebar trigger region color -->
+    <color name="trigger_region_color">#8015a0e5</color>
 </resources>

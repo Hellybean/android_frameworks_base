@@ -232,5 +232,4 @@
 
     <!-- Network stats text size -->
     <dimen name="network_stats_text_size">9dp</dimen>
-
 </resources>

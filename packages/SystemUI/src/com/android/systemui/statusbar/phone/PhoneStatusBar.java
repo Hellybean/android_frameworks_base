@@ -897,8 +897,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode {
         // listen for USER_SETUP_COMPLETE setting (per-user)
         resetUserSetupObserver();
 
-        mNetworkController.setListener(this);
-
         return mStatusBarView;
     }
 

@@ -640,7 +640,6 @@ public class AppSidebar extends FrameLayout {
                 mPosition = position;
                 createSidebarAnimations(position);
                 setTriggerWidth(1);
-                setTriggerWidth(width);
             }
 
             boolean hideLabels = Settings.System.getInt(

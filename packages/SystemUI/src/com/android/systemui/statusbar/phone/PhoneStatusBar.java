@@ -1983,7 +1983,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode {
         mHaloButton.setVisibility(View.GONE);
 
         mAnimatingFlip = true;
-        updateCarrierLabelVisibility(false);
     }
 
     public void flipToSettings() {
@@ -2058,7 +2057,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode {
                 mAnimatingFlip = false;
             }
         }, FLIP_DURATION - 150);
-        updateCarrierLabelVisibility(false);
     }
 
     public void flipPanels() {

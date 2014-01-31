@@ -2172,7 +2172,6 @@ public class NotificationManagerService extends INotificationManager.Stub
                         }
                     }
 
-                    if (readyForAlerts && (!alertsDisabled || canVibrateDuringAlertsDisabled())) {
                         // vibrate
                         final AudioManager audioManager = (AudioManager)
                             mContext.getSystemService(Context.AUDIO_SERVICE);
@@ -2226,7 +2225,7 @@ public class NotificationManagerService extends INotificationManager.Stub
                                 mVibrator.vibrate(r.sbn.getUid(), r.sbn.getBasePkg(), notification.vibrate, repeat);
                             }
                         }
-                    }
+                    
 
                     // light
                     // the most recent thing gets the light
@@ -2260,12 +2259,6 @@ public class NotificationManagerService extends INotificationManager.Stub
         return Settings.System.getIntForUser(mContext.getContentResolver(),
                 Settings.System.NOTIFICATION_CONVERT_SOUND_TO_VIBRATION,
                 1, UserHandle.USER_CURRENT_OR_SELF) != 0;
-    }
-
-    private boolean canVibrateDuringAlertsDisabled() {
-        return Settings.System.getIntForUser(mContext.getContentResolver(),
-                Settings.System.NOTIFICATION_VIBRATE_DURING_ALERTS_DISABLED,
-                0, UserHandle.USER_CURRENT_OR_SELF) != 0;
     }
 
     private void sendAccessibilityEvent(Notification notification, CharSequence packageName) {

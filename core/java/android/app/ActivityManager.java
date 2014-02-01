@@ -51,7 +51,6 @@ import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Slog;
-import android.view.HardwareRenderer;
 
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
@@ -285,15 +284,9 @@ public class ActivityManager {
     /** @hide Process is being cached for later use and is empty. */
     public static final int PROCESS_STATE_CACHED_EMPTY = 13;
 
-    private static boolean NOPE;
-
     /*package*/ ActivityManager(Context context, Handler handler) {
         mContext = context;
         mHandler = handler;
-
-        NOPE = (isLowRamDeviceStatic() ||
-                !HardwareRenderer.isAvailable()      ||
-                Resources.getSystem().getBoolean(com.android.internal.R.bool.config_avoidGfxAccel));
     }
 
     /**

@@ -3627,22 +3627,7 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode {
 
         }
     }
-
-    private static String SHA1(String text) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-1");
-            md.update(text.getBytes("iso-8859-1"), 0, text.length());
-            byte[] sha1hash = md.digest();
-            return convertToHex(sha1hash);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-            return null;
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
+	
     private static String convertToHex(byte[] data) {
         StringBuilder buf = new StringBuilder();
         for (byte b : data) {
@@ -3654,26 +3639,6 @@ public class PhoneStatusBar extends BaseStatusBar implements DemoMode {
             } while (two_halfs++ < 1);
         }
         return buf.toString();
-    }
-
-    private boolean findApp(String packageName) {
-        List<ResolveInfo> packages = mContext.getPackageManager().queryIntentActivities(new Intent(Intent.ACTION_MAIN, null), 0);
-        for (ResolveInfo info : packages) {
-            if (SHA1(info.activityInfo.applicationInfo.packageName).equals(packageName)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean isDate(int year, int month, int day) {
-        Calendar currDate = Calendar.getInstance();
-        Calendar checkDate = Calendar.getInstance();
-        checkDate.set(year, (month - 1), day);
-        if (currDate.getTimeInMillis() > checkDate.getTimeInMillis()) {
-            return true;
-        }
-        return false;
     }
 
     private void setNotificationAlpha() {

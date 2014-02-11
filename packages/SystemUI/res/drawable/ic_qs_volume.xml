@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-     Copyright (C) 2013-2014 The CyanogenMod Project
+<!-- Copyright 2014, The CyanogenMod Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -14,8 +13,11 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <!-- AOSP/CAF -->
-    <string name="progress_nomediapresent" product="default">No hay medios extraíbles\u2026</string>
-    <string name="transient_navigation_confirmation_long">Deslizar hacia abajo desde el borde de la pantalla para mostrar la barra de estado</string>
-</resources>
+
+<level-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:maxLevel="0" android:drawable="@drawable/ic_qs_volume_0" />
+    <item android:maxLevel="25" android:drawable="@drawable/ic_qs_volume_1" />
+    <item android:maxLevel="50" android:drawable="@drawable/ic_qs_volume_2" />
+    <item android:maxLevel="75" android:drawable="@drawable/ic_qs_volume_3" />
+    <item android:maxLevel="100" android:drawable="@drawable/ic_qs_volume_4" />
+</level-list>

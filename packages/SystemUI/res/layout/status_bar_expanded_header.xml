@@ -79,8 +79,8 @@
     <FrameLayout android:id="@+id/action_button_holder"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:layout_marginStart="12dp"
-        >
+        android:layout_marginStart="12dp" >
+
         <ImageView android:id="@+id/clear_all_button"
             android:layout_width="50dp"
             android:layout_height="50dp"

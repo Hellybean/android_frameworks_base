@@ -457,6 +457,7 @@ public class ActivityManager {
      * (which tends to consume a lot more RAM).
      * @hide
      */
+    static public boolean isHighEndGfx() {
         return (!isLowRamDeviceStatic() &&
                 !Resources.getSystem().getBoolean(com.android.internal.R.bool.config_avoidGfxAccel))
                 || isForcedHighEndGfx();

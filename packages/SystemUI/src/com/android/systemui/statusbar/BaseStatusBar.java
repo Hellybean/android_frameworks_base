@@ -628,8 +628,15 @@ public abstract class BaseStatusBar extends SystemUI implements
                 final String packageNameF = sbn.getPackageName();
                 final PendingIntent contentIntent = sbn.getNotification().contentIntent;
 
+                boolean expanded = Settings.System.getInt(mContext.getContentResolver(),
+                        Settings.System.EXPANDED_DESKTOP_STATE, 0) == 1;
+
                 if (packageNameF == null) return false;
                 if (v.getWindowToken() == null) return false;
+
+
+                //Long click menu broken on PIE mode...pop up menu is useless (auto-launch on long click)
+                if (expanded) launchFloating(contentIntent);
 
                 mNotificationBlamePopup = new PopupMenu(mContext, v);
                 mNotificationBlamePopup.getMenuInflater().inflate(

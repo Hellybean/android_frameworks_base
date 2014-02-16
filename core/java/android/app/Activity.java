@@ -18,6 +18,7 @@ package android.app;
 
 import android.util.ArrayMap;
 import android.util.SuperNotCalledException;
+
 import com.android.internal.app.ActionBarImpl;
 import com.android.internal.policy.PolicyManager;
 
@@ -2461,7 +2462,7 @@ public class Activity extends ContextThemeWrapper
 
     boolean scaleW, scaleH, move;
     Point lastPos;
-
+	
     /**
      * Called to process touch screen events.  You can override this to
      * intercept all touch screen events before they are dispatched to the
@@ -2476,9 +2477,9 @@ public class Activity extends ContextThemeWrapper
         WindowManager.LayoutParams attrs = mWindow.getAttributes();
         switch (ev.getAction()) {
             case MotionEvent.ACTION_DOWN:
-		onUserInteraction();
+                onUserInteraction();
                 if (mWindow.mIsFloatingWindow) {
-		    Log.d(TAG, "Y: " + ev.getY() + " Raw: " + ev.getRawY());
+                    Log.d(TAG, "Y: " + ev.getY() + " Raw: " + ev.getRawY());
                     if (ev.getX() >= attrs.width - 50) scaleW = true;
                     if (ev.getY() >= attrs.height - 50) scaleH = true;
                     if (ev.getY() <= 50) move = true;
@@ -2489,10 +2490,10 @@ public class Activity extends ContextThemeWrapper
                 }
                 break;
             case MotionEvent.ACTION_MOVE:
-               if (mWindow.mIsFloatingWindow && lastPos != null) {
+                if (mWindow.mIsFloatingWindow && lastPos != null) {
                     int x = attrs.x;
                     int y = attrs.y;
-		    Point screenSize = new Point();
+                    Point screenSize = new Point();
                     mWindowManager.getDefaultDisplay().getSize(screenSize);
                     if (move) {
                         Log.e(TAG, "Move!");
@@ -2509,7 +2510,7 @@ public class Activity extends ContextThemeWrapper
                 }
                 break;
             case MotionEvent.ACTION_UP:
-		boolean ret = scaleW || scaleH || move;
+                boolean ret = scaleW || scaleH || move;
                 scaleW = scaleH = move = false;
                 lastPos = null;
                 if (ret) return true;
